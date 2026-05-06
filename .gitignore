@@ -3,6 +3,10 @@
 # dependencies
 node_modules/
 
+# environment variables
+.env
+.env.*
+
 # Expo
 .expo/
 dist/
@@ -41,3 +45,24 @@ app-example
 # generated native folders
 /ios
 /android
+
+# IDE
+.vscode/
+.idea/
+
+# Expo extra
+.expo-shared/
+
+# logs
+logs
+*.log
+
+# Windows/macOS junk
+Thumbs.db
+
+# EAS builds
+.eas/
+
+# temp files
+*.tmp
+*.temp

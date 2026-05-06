@@ -1,98 +1,214 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import "../global.css";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { FontAwesome6 } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  Image,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function HomeScreen() {
+type BloodRequest = {
+  id: string;
+  name: string;
+  location: string;
+  time: string;
+  bloodGroup: string;
+};
+
+const CATEGORIES = [
+  { id: "1", label: "Donate Blood", icon: "🩸" },
+  { id: "2", label: "Donate\nBlood", icon: "💉" },
+  { id: "3", label: "Hospital", icon: "🏥" },
+  { id: "4", label: "Donror", icon: "👤" },
+];
+
+const BLOOD_REQUESTS: BloodRequest[] = [
+  {
+    id: "1",
+    name: "Aayan Shrestha",
+    location: "Gwarko, Lalitpur (2 min away)",
+    time: "5 min ago",
+    bloodGroup: "A+",
+  },
+  {
+    id: "2",
+    name: "Priya Maharjan",
+    location: "Pulchowk, Lalitpur (5 min away)",
+    time: "12 min ago",
+    bloodGroup: "O-",
+  },
+  {
+    id: "3",
+    name: "Rajan Thapa",
+    location: "Baneshwor, Kathmandu (10 min away)",
+    time: "20 min ago",
+    bloodGroup: "B+",
+  },
+];
+
+const AvatarPlaceholder = ({ className = "" }: { className?: string }) => (
+  <View className={`rounded-full bg-gray-200 ${className}`} />
+);
+
+const BloodGroupBadge = ({ group }: { group: string }) => (
+  <View className="items-center justify-center w-10 h-10 rounded-full bg-primary-200">
+    <Text className="text-xs font-bold text-white">{group}</Text>
+  </View>
+);
+
+const RequestCard = ({ item }: { item: BloodRequest }) => (
+  <View className="p-4 mb-5 bg-white shadow-sm rounded-2xl shadow-black/10 elevation-2">
+    {/* Top row */}
+    <View className="flex-row items-center mb-3">
+      <AvatarPlaceholder className="mr-3 w-14 h-14" />
+
+      <View className="flex-1">
+        <Text className="font-bold text-base text-gray-900 mb-0.5">
+          {item.name}
+        </Text>
+        <View className="flex-row items-center mb-0.5">
+          <Text className="mr-1 text-xs text-red-500">📍</Text>
+          <Text className="flex-shrink text-xs text-gray-500">
+            {item.location}
+          </Text>
+        </View>
+        <Text className="text-xs text-gray-400">{item.time}</Text>
+      </View>
+
+      <BloodGroupBadge group={item.bloodGroup} />
+    </View>
+
+    {/* Action buttons */}
+    <View className="flex-row items-center gap-2 mt-2">
+      <TouchableOpacity
+        className="flex-1 border border-primary-200 rounded-xl py-2.5 items-center"
+        activeOpacity={0.7}
+      >
+        <Text className="text-sm font-semibold text-primary-200">
+          View Details
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        className="flex-1 bg-primary-200 rounded-xl py-2.5 items-center"
+        activeOpacity={0.7}
+      >
+        <Text className="text-sm font-semibold text-white">Donate Blood</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        className="items-center justify-center border border-gray-200 w-11 h-11 rounded-xl"
+        activeOpacity={0.7}
+      >
+        <FontAwesome6 name="phone-volume" size={20} color="#1F1F1F" />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
+
+//main
+export default function BloodDonorScreen() {
+  const [search, setSearch] = useState("");
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <SafeAreaView className="flex-1 bg-gray-100 dark:bg-black-300">
+      <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      {/* ── Header ── */}
+      <View className="px-5 py-5 pb-6 bg-primary-200 rounded-br-3xl rounded-bl-3xl">
+        {/* Top row */}
+        <View className="flex-row items-center justify-between pt-1 mb-4">
+          <TouchableOpacity>
+            <FontAwesome6 name="align-left" size={22} color="#ffffff" />
+          </TouchableOpacity>
+
+          <Text className="text-xl font-bold tracking-wide text-white">
+            Blood Donor
+          </Text>
+
+          <View className="flex-row items-center gap-3">
+            <AvatarPlaceholder className="w-9 h-9 bg-white/30" />
+            <TouchableOpacity className="p-1">
+              <FontAwesome6 name="bell" size={24} color="#ffffff" solid />
+            </TouchableOpacity>
+          </View>
+        </View>
+        {/* Search bar */}
+        <View className="flex-row items-center gap-3 my-2">
+          <View className="flex-row items-center flex-1 px-3 py-2 bg-white shadow rounded-2xl shadow-black/10 elevation-3">
+            <FontAwesome6 name="magnifying-glass" size={20} />
+            <TextInput
+              placeholder="Search For Donors"
+              placeholderTextColor="#9CA3AF"
+              value={search}
+              onChangeText={setSearch}
+              className="flex-1 ml-2 text-sm text-gray-900"
+            />
+          </View>
+          <TouchableOpacity className="">
+            <Image
+              source={require("../../assets/icons/filter.png")}
+              className="w-7 h-7"
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 32 }}
+      >
+        {/* ── Categories ── */}
+        <View className="flex-row px-5 pt-6 pb-2">
+          {CATEGORIES.map((cat) => (
+            <TouchableOpacity
+              key={cat.id}
+              className="items-center flex-1 gap-2"
+              activeOpacity={0.7}
+            >
+              <View className="items-center justify-center w-16 h-16 bg-white rounded-full">
+                <Text className="text-3xl">{cat.icon}</Text>
+              </View>
+              {cat.label ? (
+                <Text
+                  className="text-xs font-medium leading-tight text-center text-textColor-100 dark:text-white"
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
+                  {cat.label}
+                </Text>
+              ) : null}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* ── Blood Requests ── */}
+        <View className="px-5 mt-5">
+          {/* Section header */}
+          <View className="flex-row items-center justify-between mb-4">
+            <Text className="text-[17px] font-bold text-gray-900 dark:text-white">
+              Blood Request
+            </Text>
+            <TouchableOpacity>
+              <Text className="text-sm font-semibold text-primary-200">
+                See All
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Cards */}
+          {BLOOD_REQUESTS.map((item) => (
+            <RequestCard key={item.id} item={item} />
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
