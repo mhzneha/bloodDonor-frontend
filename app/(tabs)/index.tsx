@@ -1,9 +1,13 @@
 import "../global.css";
 
 import { FontAwesome6 } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
+  ImageBackground,
+  Pressable,
   ScrollView,
   StatusBar,
   Text,
@@ -165,6 +169,42 @@ export default function BloodDonorScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
       >
+        {/* Become donor card */}
+        <View className="">
+          <ImageBackground
+            source={require("../../assets/images/bg-donor.jpg")}
+            resizeMode="contain"
+            imageStyle={{
+              borderRadius: 15,
+            }}
+            className="mx-4 mt-5 overflow-hidden h-100 rounded-2xl"
+          >
+            <LinearGradient
+              colors={[
+                "rgba(220,38,38,0.65)", // top red
+                "rgba(220,38,38,0.2)", // middle light red
+                "transparent", // bottom transparent
+              ]}
+              className="p-6 rounded-3xl"
+            >
+              <View className="p-3">
+                <Text className="text-2xl text-white">
+                  Become a Blood Donor
+                </Text>
+                <Text className="text-white">
+                  Join our donor community and help save lives during
+                  emergencies.
+                </Text>
+                <Pressable
+                  onPress={() => {}}
+                  className="text-white rounded-bg bg-primary-100 w-fit"
+                >
+                  <Text>Become Donor</Text>
+                </Pressable>
+              </View>
+            </LinearGradient>
+          </ImageBackground>
+        </View>
         {/* ── Categories ── */}
         <View className="flex-row px-5 pt-6 pb-2">
           {CATEGORIES.map((cat) => (
