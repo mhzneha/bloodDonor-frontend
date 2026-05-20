@@ -137,7 +137,9 @@ export default function BloodDonorScreen() {
           </Text>
 
           <View className="flex-row items-center gap-3">
-            <AvatarPlaceholder className="w-9 h-9 bg-white/30" />
+            <TouchableOpacity onPress={() => router.push("/profile")}>
+              <AvatarPlaceholder className="w-9 h-9 bg-white/30" />
+            </TouchableOpacity>
             <TouchableOpacity className="p-1">
               <FontAwesome6 name="bell" size={24} color="#ffffff" solid />
             </TouchableOpacity>

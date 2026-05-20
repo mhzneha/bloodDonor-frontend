@@ -45,7 +45,7 @@ interface RegisterErrorResponse {
   errors: string[];
 }
 
-const API_URL = "https://proposal-overlying-magazine.ngrok-free.dev/users";
+const API_URL = "https://blood-donor-finder-be.onrender.com/users";
 
 export default function Register() {
   const [fullName, setFullName] = useState<string>("");

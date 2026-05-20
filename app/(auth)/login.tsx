@@ -39,8 +39,7 @@ interface LoginErrorResponse {
   error?: string;
 }
 
-const API_URL =
-  "https://proposal-overlying-magazine.ngrok-free.dev/users/sign_in";
+const API_URL = "https://blood-donor-finder-be.onrender.com/users/sign_in";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
