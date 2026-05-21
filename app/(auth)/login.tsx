@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError } from "axios";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -52,7 +53,6 @@ export default function Login() {
   const handleLogin = async (): Promise<void> => {
     setErrors([]);
 
-    // Local validation
     if (!email || !password) {
       setErrors(["Please fill in all fields"]);
       return;
@@ -75,12 +75,11 @@ export default function Login() {
         },
       );
 
-      // ✅ Store token here (AsyncStorage / SecureStore recommended)
-      // await AsyncStorage.setItem("token", response.data.token);
-      // await AsyncStorage.setItem("user", JSON.stringify(response.data.user));
+      const { token, user } = response.data;
 
-      console.log("Token:", response.data.token);
-      console.log("User:", response.data.user);
+      // ✅ Save token and user to AsyncStorage
+      await AsyncStorage.setItem("auth_token", token);
+      await AsyncStorage.setItem("user", JSON.stringify(user));
 
       router.replace("/(tabs)");
     } catch (err) {
@@ -88,7 +87,6 @@ export default function Login() {
 
       if (error.response) {
         const data = error.response.data;
-        // Handle both { errors: string[] } and { error: string } shapes
         if (Array.isArray(data?.errors)) {
           setErrors(data.errors);
         } else if (data?.error) {
@@ -122,7 +120,6 @@ export default function Login() {
         </Text>
 
         <View className="p-5 mt-5 bg-white rounded-lg dark:bg-gray-800">
-          {/* Error messages */}
           {errors.length > 0 && (
             <View className="p-3 mb-4 border border-red-300 bg-red-50 dark:bg-red-900/30 rounded-xl">
               {errors.map((err: string, index: number) => (

@@ -1,9 +1,12 @@
 import "../global.css";
 
+import RequestCard from "@/components/request-card";
 import { FontAwesome6 } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
@@ -66,59 +69,70 @@ const BloodGroupBadge = ({ group }: { group: string }) => (
   </View>
 );
 
-const RequestCard = ({ item }: { item: BloodRequest }) => (
-  <View className="p-4 mb-5 bg-white shadow-sm rounded-2xl shadow-black/10 elevation-2">
-    {/* Top row */}
-    <View className="flex-row items-center mb-3">
-      <AvatarPlaceholder className="mr-3 w-14 h-14" />
-
-      <View className="flex-1">
-        <Text className="font-bold text-base text-gray-900 mb-0.5">
-          {item.name}
-        </Text>
-        <View className="flex-row items-center mb-0.5">
-          <Text className="mr-1 text-xs text-red-500">📍</Text>
-          <Text className="flex-shrink text-xs text-gray-500">
-            {item.location}
-          </Text>
-        </View>
-        <Text className="text-xs text-gray-400">{item.time}</Text>
-      </View>
-
-      <BloodGroupBadge group={item.bloodGroup} />
-    </View>
-
-    {/* Action buttons */}
-    <View className="flex-row items-center gap-2 mt-2">
-      <TouchableOpacity
-        className="flex-1 border border-primary-200 rounded-xl py-2.5 items-center"
-        activeOpacity={0.7}
-      >
-        <Text className="text-sm font-semibold text-primary-200">
-          View Details
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        className="flex-1 bg-primary-200 rounded-xl py-2.5 items-center"
-        activeOpacity={0.7}
-      >
-        <Text className="text-sm font-semibold text-white">Donate Blood</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        className="items-center justify-center border border-gray-200 w-11 h-11 rounded-xl"
-        activeOpacity={0.7}
-      >
-        <FontAwesome6 name="phone-volume" size={20} color="#1F1F1F" />
-      </TouchableOpacity>
-    </View>
-  </View>
-);
-
 //main
 export default function BloodDonorScreen() {
   const [search, setSearch] = useState("");
+  const [requests, setRequests] = useState<BloodRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchRequests = async () => {
+    try {
+      setLoading(true);
+
+      const token = await AsyncStorage.getItem("auth_token");
+
+      const res = await axios.get(
+        "https://blood-donor-finder-be.onrender.com/api/v1/blood_requests",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const data = res.data.blood_requests;
+
+      let filtered = [];
+
+      const critical = data.filter((i: any) => i.urgency === "critical");
+      const urgent = data.filter((i: any) => i.urgency === "urgent");
+      const normal = data.filter((i: any) => i.urgency === "normal");
+
+      if (critical.length > 0) {
+        filtered = critical;
+      } else if (urgent.length > 0) {
+        filtered = urgent;
+      } else {
+        filtered = normal;
+      }
+
+      // map to UI format (NO UI CHANGE)
+      const formatted = filtered.slice(0, 3).map((item: any) => ({
+        id: String(item.id),
+        name: item.patient_name,
+        location: item.hospital_name,
+        time: new Date(item.created_at).toLocaleString(),
+        bloodGroup: item.blood_group,
+      }));
+
+      setRequests(formatted);
+    } catch (err) {
+      console.log("ERROR:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  if (loading) {
+    return (
+      <View className="items-center justify-center flex-1">
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100 dark:bg-black-300">
@@ -197,12 +211,22 @@ export default function BloodDonorScreen() {
                   Join our donor community and help save lives during
                   emergencies.
                 </Text>
-                <Pressable
-                  onPress={() => {}}
-                  className="text-white rounded-bg bg-primary-100 w-fit"
-                >
-                  <Text>Become Donor</Text>
-                </Pressable>
+                <View>
+                  <Pressable
+                    onPress={() => {}}
+                    className="text-white rounded-bg bg-primary-100 w-fit"
+                  >
+                    <Text>Become Donor</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => {
+                      router.push("/blood-request/create");
+                    }}
+                    className="text-white rounded-bg bg-primary-100 w-fit"
+                  >
+                    <Text>Request Blood</Text>
+                  </Pressable>
+                </View>
               </View>
             </LinearGradient>
           </ImageBackground>
@@ -238,15 +262,19 @@ export default function BloodDonorScreen() {
             <Text className="text-[17px] font-bold text-gray-900 dark:text-white">
               Blood Request
             </Text>
-            <TouchableOpacity>
+            <Pressable
+              onPress={() => {
+                router.push("/blood-request");
+              }}
+            >
               <Text className="text-sm font-semibold text-primary-200">
                 See All
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Cards */}
-          {BLOOD_REQUESTS.map((item) => (
+          {requests.map((item) => (
             <RequestCard key={item.id} item={item} />
           ))}
         </View>
