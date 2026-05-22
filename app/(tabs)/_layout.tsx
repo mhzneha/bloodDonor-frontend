@@ -7,8 +7,8 @@ import { Redirect, Tabs } from "expo-router";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const isAuthenticated = true;
+
   if (!isAuthenticated) return <Redirect href="/login" />;
-  // return <Slot />;
 
   return (
     <Tabs
@@ -18,6 +18,7 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
       }}
     >
+      {/* Home */}
       <Tabs.Screen
         name="index"
         options={{
@@ -27,12 +28,35 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      {/* Blood Request */}
       <Tabs.Screen
-        name="explore"
+        name="blood-request"
         options={{
-          title: "Explore",
+          title: "Requests",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+            <IconSymbol size={28} name="drop.fill" color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="blood-donor"
+        options={{
+          title: "Donors",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="person.2.fill" color={color} />
+          ),
+        }}
+      />
+
+      {/* Profile */}
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="person.fill" color={color} />
           ),
         }}
       />

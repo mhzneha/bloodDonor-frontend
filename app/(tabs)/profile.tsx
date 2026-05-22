@@ -2,11 +2,11 @@ import axios from "axios";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function Profile() {
@@ -38,6 +38,22 @@ export default function Profile() {
       <Text className="mb-10 text-3xl font-bold text-black">
         Profile Screen
       </Text>
+
+      <TouchableOpacity
+        onPress={() => {
+          router.push("/blood-donor/detail");
+        }}
+        disabled={loading}
+        className=""
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text className="text-lg font-semibold text-black-500">
+            Donor Profile
+          </Text>
+        )}
+      </TouchableOpacity>
 
       <TouchableOpacity
         onPress={handleLogout}

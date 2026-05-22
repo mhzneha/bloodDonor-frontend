@@ -213,7 +213,9 @@ export default function BloodDonorScreen() {
                 </Text>
                 <View>
                   <Pressable
-                    onPress={() => {}}
+                    onPress={() => {
+                      router.push("/blood-donor/create");
+                    }}
                     className="text-white rounded-bg bg-primary-100 w-fit"
                   >
                     <Text>Become Donor</Text>
