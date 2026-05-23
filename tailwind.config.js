@@ -21,6 +21,9 @@ module.exports = {
         gray: {
           100: "#F9FAFB;",
         },
+        textGray: {
+          100: "#F9FAFB;",
+        },
         black: {
           DEFAULT: "#000000",
           100: "#8C8E98",

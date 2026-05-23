@@ -54,7 +54,7 @@ const URGENCY_LEVELS: Array<{
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const SectionLabel = ({ text }: { text: string }) => (
-  <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">
+  <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest text-gray-900 uppercase">
     {text}
   </Text>
 );
@@ -77,7 +77,7 @@ const Field = ({
   error?: string;
 }) => (
   <View className="mb-3">
-    <Text className="mb-1 text-sm font-medium text-gray-300">{label}</Text>
+    <Text className="mb-1 text-sm font-medium text-black-200">{label}</Text>
     <TextInput
       value={value}
       onChangeText={onChangeText}
@@ -85,7 +85,7 @@ const Field = ({
       placeholderTextColor="#6b7280"
       keyboardType={keyboardType}
       maxLength={maxLength}
-      className={`px-4 py-3 text-base text-white bg-gray-800 border rounded-xl ${
+      className={`px-4 py-3 text-base !text-black-200  border rounded-xl ${
         error ? "border-red-500" : "border-gray-700"
       }`}
     />
@@ -107,19 +107,21 @@ const BloodGroupDropdown = ({
 
   return (
     <View className="mb-3">
-      <Text className="mb-1 text-sm font-medium text-gray-300">
+      <Text className="mb-1 text-sm font-medium text-black-200">
         Blood Group *
       </Text>
 
       <TouchableOpacity
         onPress={() => setOpen(true)}
-        className={`flex-row items-center justify-between px-4 py-3 bg-gray-800 border rounded-xl ${
+        className={`flex-row items-center justify-between px-4 py-3  border rounded-xl ${
           error ? "border-red-500" : "border-gray-700"
         }`}
         activeOpacity={0.8}
       >
         <Text
-          className={value ? "text-white text-base" : "text-gray-500 text-base"}
+          className={
+            value ? "text-black-200 text-base" : "text-gray-500 text-base"
+          }
         >
           {value || "Select blood group"}
         </Text>
@@ -315,7 +317,7 @@ export default function CreateBloodRequest() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-gray-950"
+      className="flex-1 "
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -325,15 +327,15 @@ export default function CreateBloodRequest() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
-        <View className="px-6 py-8 bg-red-600 shadow-lg rounded-b-3xl">
+        <View className="px-6 py-8 bg-primary-100 shadow-lg rounded-b-3xl">
           <View className="flex-row items-center gap-3">
-            <View className="items-center justify-center w-10 h-10 rounded-full bg-white/20">
+            {/* <View className="items-center justify-center w-10 h-10 rounded-full bg-white/20">
               <Text className="text-lg font-bold text-white">🩸</Text>
-            </View>
+            </View> */}
             <View>
-              <Text className="text-sm font-medium text-white/70">
+              {/* <Text className="text-sm font-medium text-white/70">
                 Blood Donor Finder
-              </Text>
+              </Text> */}
               <Text className="text-2xl font-bold tracking-tight text-white">
                 New Blood Request
               </Text>
@@ -405,7 +407,7 @@ export default function CreateBloodRequest() {
             error={fieldErrors.unitsRequired}
           />
 
-          <Text className="mb-2 text-sm font-medium text-gray-300">
+          <Text className="mb-2 text-sm font-medium text-black-200">
             Urgency Level *
           </Text>
           <View className="flex-row gap-3 mb-3">
@@ -421,7 +423,7 @@ export default function CreateBloodRequest() {
                   borderWidth: 2,
                   borderColor: urgency === u.value ? u.color : "#374151",
                   backgroundColor:
-                    urgency === u.value ? u.color + "22" : "#1f2937",
+                    urgency === u.value ? u.color + "22" : "transparent",
                 }}
               >
                 <Text
@@ -471,7 +473,7 @@ export default function CreateBloodRequest() {
             onPress={handleSubmit}
             disabled={loading}
             className={`rounded-2xl py-4 items-center shadow-lg mt-2 ${
-              loading ? "bg-red-400" : "bg-red-600"
+              loading ? "bg-red-400" : "bg-primary-100"
             }`}
             activeOpacity={0.85}
           >
@@ -484,7 +486,7 @@ export default function CreateBloodRequest() {
               </View>
             ) : (
               <Text className="text-base font-bold tracking-wide text-white">
-                🩸 Submit Blood Request
+                Submit Blood Request
               </Text>
             )}
           </TouchableOpacity>
