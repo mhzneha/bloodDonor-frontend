@@ -29,10 +29,15 @@ type BloodRequest = {
 };
 
 const CATEGORIES = [
-  { id: "1", label: "Donate Blood", icon: "🩸" },
-  { id: "2", label: "Donate\nBlood", icon: "💉" },
+  {
+    id: "1",
+    label: "Request Blood",
+    icon: "🩸",
+    action: () => router.push("/blood-request/create"),
+  },
+  { id: "2", label: "Become Donor", icon: "👤" },
   { id: "3", label: "Hospital", icon: "🏥" },
-  { id: "4", label: "Donror", icon: "👤" },
+  { id: "4", label: "Donors", icon: "💉" },
 ];
 
 const BLOOD_REQUESTS: BloodRequest[] = [
@@ -187,49 +192,42 @@ export default function BloodDonorScreen() {
       >
         {/* Become donor card */}
         <View className="">
-          <ImageBackground
-            source={require("../../assets/images/bg-donor.jpg")}
-            resizeMode="contain"
-            imageStyle={{
-              borderRadius: 15,
+          <Pressable
+            onPress={() => {
+              router.push("/donor-profile/create");
             }}
-            className="mx-4 mt-5 overflow-hidden h-100 rounded-2xl"
           >
-            <LinearGradient
-              colors={[
-                "rgba(220,38,38,0.65)", // top red
-                "rgba(220,38,38,0.2)", // middle light red
-                "transparent", // bottom transparent
-              ]}
-              className="p-6 rounded-3xl"
+            <ImageBackground
+              source={require("../../assets/images/bg-donor.jpg")}
+              resizeMode="contain"
+              imageStyle={{
+                borderRadius: 15,
+              }}
+              className="mx-4 mt-5 overflow-hidden h-100 rounded-2xl"
             >
-              <View className="p-3">
-                <Text className="text-2xl text-white">
-                  Become a Blood Donor
-                </Text>
-                <Text className="text-white">
-                  Join our donor community and help save lives during
-                  emergencies.
-                </Text>
-                <View>
-                  <Pressable
-                    onPress={() => {}}
-                    className="text-white rounded-bg bg-primary-100 w-fit"
-                  >
+              <LinearGradient
+                colors={[
+                  "rgba(220,38,38,0.65)", // top red
+                  "rgba(220,38,38,0.2)", // middle light red
+                  "transparent", // bottom transparent
+                ]}
+                className="p-6 rounded-3xl"
+              >
+                <View className="p-3">
+                  <Text className="text-2xl text-white">
+                    Become a Blood Donor
+                  </Text>
+                  <Text className="text-white">
+                    Join our donor community and help save lives during
+                    emergencies.
+                  </Text>
+                  <View className="text-white rounded-bg bg-primary-100 w-fit">
                     <Text>Become Donor</Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => {
-                      router.push("/blood-request/create");
-                    }}
-                    className="text-white rounded-bg bg-primary-100 w-fit"
-                  >
-                    <Text>Request Blood</Text>
-                  </Pressable>
+                  </View>
                 </View>
-              </View>
-            </LinearGradient>
-          </ImageBackground>
+              </LinearGradient>
+            </ImageBackground>
+          </Pressable>
         </View>
         {/* ── Categories ── */}
         <View className="flex-row px-5 pt-6 pb-2">
@@ -238,6 +236,8 @@ export default function BloodDonorScreen() {
               key={cat.id}
               className="items-center flex-1 gap-2"
               activeOpacity={0.7}
+              onPress={cat.action}
+              disabled={!cat.action}
             >
               <View className="items-center justify-center w-16 h-16 bg-white rounded-full">
                 <Text className="text-3xl">{cat.icon}</Text>
