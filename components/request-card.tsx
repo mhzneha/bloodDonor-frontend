@@ -53,15 +53,15 @@ export default function RequestCard({ item }: { item: BloodRequest }) {
               params: { id: item.id },
             })
           }
-          className="flex-1 border border-red-400 rounded-xl py-2.5 items-center"
+          className="flex-1 bg-red-500 rounded-xl py-2.5 px-1 items-center"
         >
-          <Text className="text-sm font-semibold text-red-500">
-            View Details
-          </Text>
+          <Text className="text-sm font-semibold text-white">View Details</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="flex-1 bg-red-500 rounded-xl py-2.5 px-1 items-center">
-          <Text className="text-sm font-semibold text-white">Donate Blood</Text>
+        <TouchableOpacity className="flex-1 border border-red-400 rounded-xl py-2.5 items-center">
+          <Text className="text-sm font-semibold text-red-500">
+            Donate Blood
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity className="items-center justify-center border border-gray-200 w-11 h-11 rounded-xl">

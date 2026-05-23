@@ -288,7 +288,7 @@ export default function CreateBloodRequest() {
       setLongitude("");
       setFieldErrors({});
 
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/blood-request");
 
       setTimeout(() => {
         Alert.alert("Success", "Blood request created successfully!");

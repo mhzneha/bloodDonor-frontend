@@ -8,6 +8,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ImageBackground,
   Pressable,
@@ -29,8 +30,16 @@ type BloodRequest = {
 };
 
 const CATEGORIES = [
-  { id: "1", label: "Donate Blood", icon: "🩸" },
-  { id: "2", label: "Donate\nBlood", icon: "💉" },
+  {
+    id: "1",
+    label: "Add Request",
+    icon: require("@/assets/icons/add-request.png"),
+  },
+  {
+    id: "2",
+    label: "Find Donor",
+    icon: require("@/assets/icons/find-donor.png"),
+  },
   { id: "3", label: "Hospital", icon: "🏥" },
   { id: "4", label: "Donror", icon: "👤" },
 ];
@@ -129,7 +138,7 @@ export default function BloodDonorScreen() {
   if (loading) {
     return (
       <View className="items-center justify-center flex-1">
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="red" />
       </View>
     );
   }
@@ -142,8 +151,8 @@ export default function BloodDonorScreen() {
       <View className="px-5 py-5 pb-6 bg-primary-200 rounded-br-3xl rounded-bl-3xl">
         {/* Top row */}
         <View className="flex-row items-center justify-between pt-1 mb-4">
-          <TouchableOpacity>
-            <FontAwesome6 name="align-left" size={22} color="#ffffff" />
+          <TouchableOpacity onPress={() => router.push("/profile")}>
+            <AvatarPlaceholder className="w-9 h-9 bg-white/30" />
           </TouchableOpacity>
 
           <Text className="text-xl font-bold tracking-wide text-white">
@@ -151,9 +160,6 @@ export default function BloodDonorScreen() {
           </Text>
 
           <View className="flex-row items-center gap-3">
-            <TouchableOpacity onPress={() => router.push("/profile")}>
-              <AvatarPlaceholder className="w-9 h-9 bg-white/30" />
-            </TouchableOpacity>
             <TouchableOpacity className="p-1">
               <FontAwesome6 name="bell" size={24} color="#ffffff" solid />
             </TouchableOpacity>
@@ -197,36 +203,42 @@ export default function BloodDonorScreen() {
           >
             <LinearGradient
               colors={[
-                "rgba(220,38,38,0.65)", // top red
-                "rgba(220,38,38,0.2)", // middle light red
-                "transparent", // bottom transparent
+                "rgba(220,38,38,0.75)",
+                "rgba(220,38,38,0.5)",
+                "rgba(220,38,38,0.2)",
               ]}
-              className="p-6 rounded-3xl"
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              className="p-2 rounded-3xl"
             >
               <View className="p-3">
-                <Text className="text-2xl text-white">
+                <Text className="text-2xl font-semibold text-white">
                   Become a Blood Donor
                 </Text>
                 <Text className="text-white">
                   Join our donor community and help save lives during
                   emergencies.
                 </Text>
-                <View>
+                <View className="flex-row gap-3 mt-3">
                   <Pressable
                     onPress={() => {
                       router.push("/blood-donor/create");
                     }}
-                    className="text-white rounded-bg bg-primary-100 w-fit"
+                    className="px-3 py-1 bg-white rounded-xl w-fit"
                   >
-                    <Text>Become Donor</Text>
+                    <Text className="text-base font-semibold text-primary-100">
+                      Become Donor
+                    </Text>
                   </Pressable>
                   <Pressable
                     onPress={() => {
                       router.push("/blood-request/create");
                     }}
-                    className="text-white rounded-bg bg-primary-100 w-fit"
+                    className="px-3 py-1 bg-white rounded-xl w-fit"
                   >
-                    <Text>Request Blood</Text>
+                    <Text className="text-base font-semibold text-primary-100">
+                      Request Blood
+                    </Text>
                   </Pressable>
                 </View>
               </View>
@@ -242,7 +254,8 @@ export default function BloodDonorScreen() {
               activeOpacity={0.7}
             >
               <View className="items-center justify-center w-16 h-16 bg-white rounded-full">
-                <Text className="text-3xl">{cat.icon}</Text>
+                {/* <Text className="text-3xl">{cat.icon}</Text> */}
+                <Image source={cat.icon} className="!w-10 !h-10" />
               </View>
               {cat.label ? (
                 <Text
@@ -266,7 +279,7 @@ export default function BloodDonorScreen() {
             </Text>
             <Pressable
               onPress={() => {
-                router.push("/blood-request");
+                router.push("/blood-request/create");
               }}
             >
               <Text className="text-sm font-semibold text-primary-200">
