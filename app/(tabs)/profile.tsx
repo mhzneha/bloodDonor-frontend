@@ -56,6 +56,12 @@ export default function Profile() {
       </TouchableOpacity>
 
       <TouchableOpacity
+        onPress={() => router.push("/blood-request/my-request")}
+      >
+        <Text>My Requests</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         onPress={handleLogout}
         disabled={loading}
         className="items-center justify-center w-full py-4 bg-red-600 rounded-2xl"
