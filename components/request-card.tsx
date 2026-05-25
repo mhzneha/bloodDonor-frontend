@@ -11,6 +11,11 @@ export type BloodRequest = {
   bloodGroup: string;
 };
 
+type RequestCardProps = {
+  item: BloodRequest;
+  isMyRequest?: boolean;
+};
+
 const AvatarPlaceholder = ({ className = "" }: { className?: string }) => (
   <View className={`rounded-full bg-gray-200 ${className}`} />
 );
@@ -21,9 +26,12 @@ const BloodGroupBadge = ({ group }: { group: string }) => (
   </View>
 );
 
-export default function RequestCard({ item }: { item: BloodRequest }) {
+export default function RequestCard({
+  item,
+  isMyRequest = false,
+}: RequestCardProps) {
   return (
-    <View className="p-4 mb-5 bg-white shadow-sm rounded-2xl elevation-2">
+    <View className="p-4 mb-5 bg-gray-100 shadow-sm rounded-2xl elevation-2">
       {/* Top row */}
       <View className="flex-row items-center mb-3">
         <AvatarPlaceholder className="mr-3 w-14 h-14" />
@@ -32,12 +40,15 @@ export default function RequestCard({ item }: { item: BloodRequest }) {
           <Text className="font-bold text-base text-gray-900 mb-0.5">
             {item.name}
           </Text>
+
           <View className="flex-row items-center mb-0.5">
             <Text className="mr-1 text-xs text-red-500">📍</Text>
+
             <Text className="flex-shrink text-xs text-gray-500">
               {item.location}
             </Text>
           </View>
+
           <Text className="text-xs text-gray-400">{item.time}</Text>
         </View>
 
@@ -58,11 +69,27 @@ export default function RequestCard({ item }: { item: BloodRequest }) {
           <Text className="text-sm font-semibold text-white">View Details</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="flex-1 border border-red-400 rounded-xl py-2.5 items-center">
-          <Text className="text-sm font-semibold text-red-500">
-            Donate Blood
-          </Text>
-        </TouchableOpacity>
+        {isMyRequest ? (
+          <TouchableOpacity
+            className="flex-1 border border-red-400 rounded-xl py-2.5 items-center"
+            onPress={() => {
+              router.push({
+                pathname: "/(tabs)/blood-request/matching-donor",
+                params: { id: item.id },
+              });
+            }}
+          >
+            <Text className="text-sm font-semibold text-red-500">
+              View Donors
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity className="flex-1 border border-red-400 rounded-xl py-2.5 items-center">
+            <Text className="text-sm font-semibold text-red-500">
+              Donate Blood
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity className="items-center justify-center border border-gray-200 w-11 h-11 rounded-xl">
           <FontAwesome6 name="phone-volume" size={18} color="#1F1F1F" />

@@ -3,11 +3,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const API_URL =
@@ -85,6 +85,7 @@ export default function MyRequestsPage() {
         {data.map((item) => (
           <RequestCard
             key={item.id}
+            isMyRequest
             item={{
               id: String(item.id),
               name: item.patient_name,

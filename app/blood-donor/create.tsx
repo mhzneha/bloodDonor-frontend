@@ -1,3 +1,4 @@
+import { FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as Location from "expo-location";
@@ -35,7 +36,7 @@ const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const SectionLabel = ({ text }: { text: string }) => (
-  <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">
+  <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest text-gray-900 uppercase">
     {text}
   </Text>
 );
@@ -54,19 +55,21 @@ const BloodGroupDropdown = ({
 
   return (
     <View className="mb-3">
-      <Text className="mb-1 text-sm font-medium text-gray-300">
+      <Text className="mb-1 text-sm font-medium text-black-200">
         Blood Group *
       </Text>
 
       <TouchableOpacity
         onPress={() => setOpen(true)}
-        className={`flex-row items-center justify-between px-4 py-3 bg-gray-800 border rounded-xl ${
+        className={`flex-row items-center justify-between px-4 py-3  border rounded-xl ${
           error ? "border-red-500" : "border-gray-700"
         }`}
         activeOpacity={0.8}
       >
         <Text
-          className={value ? "text-white text-base" : "text-gray-500 text-base"}
+          className={
+            value ? "text-black-200 text-base" : "text-gray-500 text-base"
+          }
         >
           {value || "Select your blood group"}
         </Text>
@@ -171,23 +174,25 @@ const DatePickerField = ({
 
   return (
     <View className="mb-3">
-      <Text className="mb-1 text-sm font-medium text-gray-300">{label}</Text>
+      <Text className="mb-1 text-sm font-medium text-black-200">{label}</Text>
 
       <TouchableOpacity
         onPress={() => setOpen(true)}
-        className={`flex-row items-center justify-between px-4 py-3 bg-gray-800 border rounded-xl ${
+        className={`flex-row items-center justify-between px-4 py-3 !text-black-200  border rounded-xl ${
           error ? "border-red-500" : "border-gray-700"
         }`}
         activeOpacity={0.8}
       >
         <Text
           className={
-            displayValue ? "text-white text-base" : "text-gray-500 text-base"
+            displayValue
+              ? "!text-black-200 text-base"
+              : "text-gray-500 text-base"
           }
         >
           {displayValue || "Select date (optional)"}
         </Text>
-        <Text className="text-lg">📅</Text>
+        <FontAwesome6 name="calendar-days" size={24} color="#666876" solid />
       </TouchableOpacity>
 
       {value && (
@@ -211,7 +216,7 @@ const DatePickerField = ({
               <TouchableOpacity onPress={() => setOpen(false)}>
                 <Text className="text-base text-gray-400">Cancel</Text>
               </TouchableOpacity>
-              <Text className="text-base font-bold text-white">
+              <Text className="text-base font-bold text-black-200">
                 Last Donated
               </Text>
               <TouchableOpacity onPress={confirm}>
@@ -437,7 +442,7 @@ export default function BecomeDonor() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-gray-950"
+      className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -447,15 +452,15 @@ export default function BecomeDonor() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
-        <View className="px-6 py-8 shadow-lg bg-rose-700 rounded-b-3xl">
+        <View className="px-6 py-8 shadow-lg bg-primary-100 rounded-b-3xl">
           <View className="flex-row items-center gap-3">
-            <View className="items-center justify-center w-10 h-10 rounded-full bg-white/20">
+            {/* <View className="items-center justify-center w-10 h-10 rounded-full bg-white/20">
               <Text className="text-lg">❤️</Text>
-            </View>
+            </View> */}
             <View>
-              <Text className="text-sm font-medium text-white/70">
+              {/* <Text className="text-sm font-medium text-white/70">
                 Blood Donor Finder
-              </Text>
+              </Text> */}
               <Text className="text-2xl font-bold tracking-tight text-white">
                 Become a Donor
               </Text>
@@ -482,9 +487,9 @@ export default function BecomeDonor() {
 
           {/* Availability toggle */}
           <SectionLabel text="Availability" />
-          <View className="flex-row items-center justify-between px-4 py-4 mb-3 bg-gray-800 border border-gray-700 rounded-xl">
+          <View className="flex-row items-center justify-between px-4 py-4 mb-3 border border-gray-700 rounded-xl">
             <View style={{ flex: 1, marginRight: 12 }}>
-              <Text className="text-base font-semibold text-white">
+              <Text className="text-base font-semibold text-black-200">
                 Available to donate
               </Text>
               <Text className="mt-0.5 text-xs text-gray-400">
@@ -496,8 +501,8 @@ export default function BecomeDonor() {
             <Switch
               value={available}
               onValueChange={setAvailable}
-              trackColor={{ false: "#374151", true: "#be123c" }}
-              thumbColor={available ? "#fff" : "#9ca3af"}
+              trackColor={{ false: "#EF5350", true: "#EF5350" }}
+              thumbColor={available ? "#fff" : "#EF5350"}
             />
           </View>
 
@@ -520,20 +525,25 @@ export default function BecomeDonor() {
           <TouchableOpacity
             onPress={detectLocation}
             disabled={locLoading}
-            className="flex-row items-center justify-center gap-2 py-3 mb-3 bg-gray-800 border border-gray-700 rounded-xl"
+            className="flex-row items-center justify-center gap-2 py-3 mb-3 border border-gray-700 rounded-xl"
             activeOpacity={0.8}
           >
             {locLoading ? (
               <>
                 <ActivityIndicator color="#ef4444" size="small" />
-                <Text className="text-sm font-semibold text-gray-300">
+                <Text className="text-sm font-semibold text-black-200">
                   Detecting location...
                 </Text>
               </>
             ) : (
               <>
-                <Text className="text-base">📍</Text>
-                <Text className="text-sm font-semibold text-gray-300">
+                <FontAwesome6
+                  name="location-dot"
+                  size={22}
+                  color="#EF5350"
+                  solid
+                />
+                <Text className="text-sm font-semibold text-black-200">
                   Auto-detect my location
                 </Text>
               </>
@@ -542,15 +552,14 @@ export default function BecomeDonor() {
 
           {/* Location name */}
           <View className="mb-3">
-            <Text className="mb-1 text-sm font-medium text-gray-300">
+            <Text className="mb-1 text-sm font-medium text-black-200">
               Location Name *
             </Text>
             <View
-              className={`flex-row items-center px-4 py-3 bg-gray-800 border rounded-xl ${
+              className={`flex-row items-center px-4 py-3  border rounded-xl ${
                 fieldErrors.location ? "border-red-500" : "border-gray-700"
               }`}
             >
-              <Text className="mr-2 text-base">🏙️</Text>
               <TextInput
                 value={location}
                 onChangeText={(v) => {
@@ -559,7 +568,7 @@ export default function BecomeDonor() {
                 }}
                 placeholder="e.g. Kathmandu, Nepal"
                 placeholderTextColor="#6b7280"
-                className="flex-1 text-base text-white"
+                className="flex-1 text-base text-black-200"
               />
             </View>
             {fieldErrors.location ? (
@@ -572,7 +581,7 @@ export default function BecomeDonor() {
           {/* Lat / Lng */}
           <View className="flex-row gap-3">
             <View className="flex-1">
-              <Text className="mb-1 text-sm font-medium text-gray-300">
+              <Text className="mb-1 text-sm font-medium text-black-200">
                 Latitude *
               </Text>
               <TextInput
@@ -584,7 +593,7 @@ export default function BecomeDonor() {
                 placeholder="27.7172"
                 placeholderTextColor="#6b7280"
                 keyboardType="decimal-pad"
-                className={`px-4 py-3 text-base text-white bg-gray-800 border rounded-xl ${
+                className={`px-4 py-3 text-base text-black-200 border rounded-xl ${
                   fieldErrors.latitude ? "border-red-500" : "border-gray-700"
                 }`}
               />
@@ -595,7 +604,7 @@ export default function BecomeDonor() {
               ) : null}
             </View>
             <View className="flex-1">
-              <Text className="mb-1 text-sm font-medium text-gray-300">
+              <Text className="mb-1 text-sm font-medium text-black-200">
                 Longitude *
               </Text>
               <TextInput
@@ -607,7 +616,7 @@ export default function BecomeDonor() {
                 placeholder="85.3240"
                 placeholderTextColor="#6b7280"
                 keyboardType="decimal-pad"
-                className={`px-4 py-3 text-base text-white bg-gray-800 border rounded-xl ${
+                className={`px-4 py-3 text-base text-black-200 border rounded-xl ${
                   fieldErrors.longitude ? "border-red-500" : "border-gray-700"
                 }`}
               />
@@ -634,7 +643,7 @@ export default function BecomeDonor() {
             onPress={handleSubmit}
             disabled={loading}
             className={`rounded-2xl py-4 items-center shadow-lg mt-6 ${
-              loading ? "bg-rose-400" : "bg-rose-700"
+              loading ? "bg-primary-100" : "bg-primary-200"
             }`}
             activeOpacity={0.85}
           >
@@ -647,7 +656,7 @@ export default function BecomeDonor() {
               </View>
             ) : (
               <Text className="text-base font-bold tracking-wide text-white">
-                ❤️ Register as Donor
+                Register as Donor
               </Text>
             )}
           </TouchableOpacity>

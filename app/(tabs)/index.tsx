@@ -279,7 +279,7 @@ export default function BloodDonorScreen() {
             </Text>
             <Pressable
               onPress={() => {
-                router.push("/blood-request/create");
+                router.push("/blood-request/");
               }}
             >
               <Text className="text-sm font-semibold text-primary-200">

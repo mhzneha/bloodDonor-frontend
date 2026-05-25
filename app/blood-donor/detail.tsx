@@ -1,3 +1,9 @@
+import {
+  FontAwesome6,
+  Fontisto,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
@@ -78,7 +84,8 @@ const InfoRow = ({
   valueColor,
   last = false,
 }: {
-  icon: string;
+  // icon: string;
+  icon?: React.ReactNode;
   label: string;
   value: string;
   valueColor?: string;
@@ -121,7 +128,7 @@ const StatCard = ({
   color: string;
 }) => (
   <View
-    className="items-center flex-1 py-4 bg-gray-900 border border-gray-800 rounded-2xl"
+    className="items-center flex-1 py-4 border border-gray-800 rounded-2xl"
     style={{ gap: 4 }}
   >
     <Text style={{ fontSize: 22 }}>{icon}</Text>
@@ -253,7 +260,7 @@ export default function DonorProfileScreen() {
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <View className="flex-1 bg-gray-950">
+      <View className="flex-1 ">
         <View
           className="px-6 py-8 rounded-b-3xl"
           style={{ backgroundColor: "#4c0519", gap: 8 }}
@@ -283,8 +290,8 @@ export default function DonorProfileScreen() {
   // ── No profile ────────────────────────────────────────────────────────────
   if (error === "no_profile" || !profile) {
     return (
-      <View className="flex-1 bg-gray-950">
-        <View className="px-6 py-8 bg-rose-700 rounded-b-3xl">
+      <View className="flex-1 ">
+        <View className="px-6 py-8 bg-primary-100 rounded-b-3xl">
           <View className="flex-row items-center" style={{ gap: 12 }}>
             <View className="items-center justify-center w-10 h-10 rounded-full bg-white/20">
               <Text style={{ fontSize: 18 }}>❤️</Text>
@@ -348,7 +355,7 @@ export default function DonorProfileScreen() {
 
   // ── Profile ───────────────────────────────────────────────────────────────
   return (
-    <View className="flex-1 bg-gray-950">
+    <View className="flex-1 ">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 48 }}
@@ -363,8 +370,8 @@ export default function DonorProfileScreen() {
       >
         {/* Header */}
         <View
-          className="px-6 pt-10 pb-8 rounded-b-3xl"
-          style={{ backgroundColor: "#4c0519" }}
+          className="px-6 pt-10 pb-8 rounded-b-3xl bg-primary-200"
+          // style={{ backgroundColor: "#4c0519" }}
         >
           <View className="flex-row items-center justify-between mb-6">
             <View>
@@ -381,22 +388,22 @@ export default function DonorProfileScreen() {
               style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
               activeOpacity={0.8}
             >
-              <Text className="text-sm font-semibold text-white">✏️ Edit</Text>
+              <Text className="text-sm font-semibold text-white">Edit</Text>
             </TouchableOpacity>
           </View>
 
           {/* Avatar */}
           <View className="items-center" style={{ gap: 10 }}>
             <View
-              className="items-center justify-center border-4 rounded-full"
+              className="items-center justify-center bg-white border-4 rounded-full"
               style={{
-                width: 84,
-                height: 84,
-                backgroundColor: bloodColor + "22",
+                width: 70,
+                height: 70,
+                // backgroundColor: bloodColor + "22",
                 borderColor: bloodColor,
               }}
             >
-              <Text style={{ fontSize: 36 }}>🩸</Text>
+              <Fontisto name="blood-drop" size={22} color="#880808" />
             </View>
 
             {/* Blood group pill */}
@@ -477,19 +484,19 @@ export default function DonorProfileScreen() {
           {/* Stat cards */}
           <View className="flex-row" style={{ gap: 12 }}>
             <StatCard
-              icon="🩸"
+              icon=""
               label="Blood Group"
               value={profile.blood_group}
               color={bloodColor}
             />
             <StatCard
-              icon={profile.available ? "🟢" : "🔴"}
+              icon={profile.available ? "" : ""}
               label="Status"
               value={profile.available ? "Active" : "Off"}
               color={profile.available ? "#4ade80" : "#f87171"}
             />
             <StatCard
-              icon={profile.verified ? "✅" : "🔲"}
+              icon={profile.verified ? "" : ""}
               label="Verified"
               value={profile.verified ? "Yes" : "No"}
               color={profile.verified ? "#60a5fa" : "#6b7280"}
@@ -503,19 +510,25 @@ export default function DonorProfileScreen() {
             </Text>
             <View className="px-4 bg-gray-900 border border-gray-800 rounded-2xl">
               <InfoRow
-                icon="💉"
+                icon={<Fontisto name="blood-drop" size={15} color="#fff" />}
                 label="Last Donated"
                 value={formatDate(profile.last_donated_at)}
                 valueColor={profile.last_donated_at ? "#f3f4f6" : "#4b5563"}
               />
               <InfoRow
-                icon="⏳"
+                icon={
+                  <FontAwesome6
+                    name="hourglass-half"
+                    size={15}
+                    color="#ffffff"
+                  />
+                }
                 label="Time Since Donation"
                 value={timeAgo(profile.last_donated_at)}
                 valueColor={profile.last_donated_at ? "#f3f4f6" : "#4b5563"}
               />
               <InfoRow
-                icon="✅"
+                icon={<FontAwesome6 name="check" size={15} color="#ffffff" />}
                 label="Eligible to Donate"
                 value={eligible ? "Yes — ready!" : "Not yet (90-day wait)"}
                 valueColor={eligible ? "#4ade80" : "#fbbf24"}
@@ -531,19 +544,29 @@ export default function DonorProfileScreen() {
             </Text>
             <View className="px-4 bg-gray-900 border border-gray-800 rounded-2xl">
               <InfoRow
-                icon="📍"
+                icon={
+                  <FontAwesome6 name="location-dot" size={15} color="#ffffff" />
+                }
                 label="Area"
                 value={profile.location ?? "Not set"}
                 valueColor={profile.location ? "#f3f4f6" : "#4b5563"}
               />
               <InfoRow
-                icon="🌐"
+                icon={
+                  <MaterialCommunityIcons name="earth" size={15} color="#fff" />
+                }
                 label="Latitude"
                 value={profile.latitude ?? "—"}
                 valueColor={profile.latitude ? "#f3f4f6" : "#4b5563"}
               />
               <InfoRow
-                icon="🌐"
+                icon={
+                  <MaterialCommunityIcons
+                    name="crosshairs-gps"
+                    size={15}
+                    color="#fff"
+                  />
+                }
                 label="Longitude"
                 value={profile.longitude ?? "—"}
                 valueColor={profile.longitude ? "#f3f4f6" : "#4b5563"}
@@ -560,17 +583,23 @@ export default function DonorProfileScreen() {
             <View className="px-4 bg-gray-900 border border-gray-800 rounded-2xl">
               <InfoRow icon="🆔" label="Profile ID" value={`#${profile.id}`} />
               <InfoRow
-                icon="📅"
+                icon={
+                  <FontAwesome6
+                    name="calendar-days"
+                    size={15}
+                    color="#ffffff"
+                  />
+                }
                 label="Registered"
                 value={formatDate(profile.created_at)}
               />
               <InfoRow
-                icon="🔄"
+                icon={<MaterialIcons name="update" size={15} color="#ffffff" />}
                 label="Last Updated"
                 value={timeAgo(profile.updated_at)}
               />
               <InfoRow
-                icon="🕐"
+                icon={<FontAwesome6 name="clock" size={15} color="#ffffff" />}
                 label="Last Active"
                 value={timeAgo(profile.last_active_at)}
                 valueColor={profile.last_active_at ? "#f3f4f6" : "#4b5563"}
@@ -589,7 +618,7 @@ export default function DonorProfileScreen() {
             }}
           >
             <View className="flex-row items-center" style={{ gap: 12 }}>
-              <Text style={{ fontSize: 28 }}>{eligible ? "🎉" : "⏳"}</Text>
+              <Text style={{ fontSize: 28 }}>{eligible ? "" : ""}</Text>
               <View style={{ flex: 1 }}>
                 <Text
                   className="text-sm font-bold"
@@ -612,12 +641,12 @@ export default function DonorProfileScreen() {
           <View style={{ gap: 12 }}>
             <TouchableOpacity
               onPress={() => router.push("/blood-donor/update?edit=true")}
-              className="flex-row items-center justify-center py-4 rounded-2xl bg-rose-700"
+              className="flex-row items-center justify-center py-4 rounded-2xl bg-primary-200"
               style={{ gap: 8 }}
               activeOpacity={0.85}
             >
               <Text className="text-base font-bold text-white">
-                ✏️ Edit Profile
+                Edit Profile
               </Text>
             </TouchableOpacity>
 
@@ -628,9 +657,7 @@ export default function DonorProfileScreen() {
               activeOpacity={0.85}
             >
               <Text className="text-base font-bold text-gray-200">
-                {profile.available
-                  ? "🔴 Mark Unavailable"
-                  : "🟢 Mark Available"}
+                {profile.available ? " Mark Unavailable" : "Mark Available"}
               </Text>
             </TouchableOpacity>
           </View>
