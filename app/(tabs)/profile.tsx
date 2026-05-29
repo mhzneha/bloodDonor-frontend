@@ -17,7 +17,7 @@ export default function Profile() {
       setLoading(true);
 
       const response = await axios.delete(
-        "https://blood-donor-finder-be.onrender.com/users/sign_out",
+        "http://192.168.101.18:3000/users/sign_out",
       );
 
       Alert.alert("Success", response.data.message);

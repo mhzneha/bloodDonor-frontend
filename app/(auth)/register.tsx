@@ -45,7 +45,7 @@ interface RegisterErrorResponse {
   errors: string[];
 }
 
-const API_URL = "https://blood-donor-finder-be.onrender.com/users";
+const API_URL = "http://192.168.101.18:3000/users";
 
 export default function Register() {
   const [fullName, setFullName] = useState<string>("");

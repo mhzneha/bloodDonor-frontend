@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Alert, AppState, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 
-const BASE_URL = "https://blood-donor-finder-be.onrender.com/api/v1";
+const BASE_URL = "http://192.168.101.18:3000/api/v1";
 
 export default function DonorLiveTrackingScreen() {
   const { requestId } = useLocalSearchParams<{ requestId: string }>();
