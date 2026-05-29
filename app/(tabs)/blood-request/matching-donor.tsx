@@ -1,18 +1,19 @@
-import { FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    Alert,
-    Linking,
-    RefreshControl,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Linking,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface BloodRequest {
@@ -175,9 +176,11 @@ const DonorCardSkeleton = () => (
 const DonorCard = ({
   donor,
   requestBloodGroup,
+  onSendRequest,
 }: {
   donor: Donor;
   requestBloodGroup: string;
+  onSendRequest: () => void;
 }) => {
   const router = useRouter();
   const bloodColor = BLOOD_GROUP_COLORS[donor.blood_group] ?? "#ef4444";
@@ -360,6 +363,16 @@ const DonorCard = ({
           <Text className="text-sm font-bold text-white">Call</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          onPress={onSendRequest}
+          className="flex-1 flex-row items-center justify-center rounded-xl py-2.5 bg-primary-200"
+          style={{ gap: 6 }}
+          activeOpacity={0.85}
+        >
+          <FontAwesome name="send-o" size={15} color="#ffffff" />
+          <Text className="text-sm font-bold text-white">Send Request</Text>
+        </TouchableOpacity>
+
         {/* <TouchableOpacity
           onPress={() =>
             router.push({
@@ -424,7 +437,7 @@ export default function MatchingDonorsScreen() {
           },
         },
       );
-      console.log("DONORS RESPONSE:", JSON.stringify(res, null, 2));
+      // console.log("DONORS RESPONSE:", JSON.stringify(res, null, 2));
 
       setData(res);
     } catch (err: any) {
@@ -484,6 +497,90 @@ export default function MatchingDonorsScreen() {
   //       </View>
   //     );
   //   }
+
+  // const sendDonationRequest = async (donorId: number) => {
+  //   try {
+  //     const token = await AsyncStorage.getItem("auth_token");
+
+  //     if (!token) {
+  //       router.replace("/login");
+  //       return;
+  //     }
+
+  //     const { data } = await axios.post(
+  //       `${BASE_URL}/blood_donation_requests`,
+  //       {
+  //         blood_request_id: Number(id),
+  //         donor_profile_id: donorId,
+  //         message: "Can you accept please?",
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           Accept: "application/json",
+  //           "Content-Type": "application/json",
+  //         },
+  //       },
+  //     );
+
+  //     Alert.alert("Success", data.message || "Request sent");
+
+  //     console.log("Donation Request:", data);
+  //   } catch (err: any) {
+  //     console.log("ERROR:", err?.response?.data);
+
+  //     Alert.alert(
+  //       "Error",
+  //       err?.response?.data?.message || "Failed to send request",
+  //     );
+  //   }
+  // };
+
+  const sendDonationRequest = async (donorId: number, donorName: string) => {
+    try {
+      const token = await AsyncStorage.getItem("auth_token");
+      if (!token) {
+        router.replace("/login");
+        return;
+      }
+
+      const { data } = await axios.post(
+        `${BASE_URL}/blood_donation_requests`,
+        {
+          blood_request_id: Number(id),
+          donor_profile_id: donorId,
+          message: "Can you accept please?",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      Toast.show({
+        type: "success",
+        text1: "Request Sent",
+        text2: `${donorName} has been notified.`,
+        visibilityTime: 3000,
+        position: "bottom",
+      });
+
+      console.log("Donation Request:", data);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Failed to send request";
+
+      Toast.show({
+        type: "error",
+        text1: "Failed to Send",
+        text2: msg,
+        visibilityTime: 3000,
+        position: "bottom",
+      });
+    }
+  };
 
   return (
     <View className="flex-1 ">
@@ -677,6 +774,9 @@ export default function MatchingDonorsScreen() {
                   key={donor.donor_id}
                   donor={donor}
                   requestBloodGroup={data?.blood_request.blood_group ?? ""}
+                  onSendRequest={() =>
+                    sendDonationRequest(donor.donor_id, donor.donor_name)
+                  }
                 />
               ))}
             </View>
@@ -704,6 +804,9 @@ export default function MatchingDonorsScreen() {
                     key={donor.donor_id}
                     donor={donor}
                     requestBloodGroup={data?.blood_request.blood_group ?? ""}
+                    onSendRequest={() =>
+                      sendDonationRequest(donor.donor_id, donor.donor_name)
+                    }
                   />
                 ))}
               </View>

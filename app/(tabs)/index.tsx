@@ -32,7 +32,7 @@ type BloodRequest = {
 const CATEGORIES = [
   {
     id: "1",
-    label: "Add Request",
+    label: "Incoming\nrequest",
     icon: require("@/assets/icons/add-request.png"),
   },
   {
@@ -134,6 +134,33 @@ export default function BloodDonorScreen() {
   useEffect(() => {
     fetchRequests();
   }, []);
+
+  const handleCategoryPress = async (id: string) => {
+    // const user = await AsyncStorage.getItem("user");
+    // const parsedUser = user ? JSON.parse(user) : null;
+
+    // const isDonor = parsedUser?.role === "donor";
+
+    if (id === "1") {
+      // if (isDonor) {
+      router.push("/blood-donor/request");
+      // } else {
+      alert("Only registered donors can view incoming requests.");
+      // }
+    }
+
+    if (id === "2") {
+      router.push("/blood-request/track-donor");
+    }
+
+    if (id === "3") {
+      // router.push("/hospital");
+    }
+
+    if (id === "4") {
+      router.push("/profile");
+    }
+  };
 
   if (loading) {
     return (
@@ -252,6 +279,7 @@ export default function BloodDonorScreen() {
               key={cat.id}
               className="items-center flex-1 gap-2"
               activeOpacity={0.7}
+              onPress={() => handleCategoryPress(cat.id)}
             >
               <View className="items-center justify-center w-16 h-16 bg-white rounded-full">
                 {/* <Text className="text-3xl">{cat.icon}</Text> */}
