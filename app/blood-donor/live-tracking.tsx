@@ -40,7 +40,7 @@ export default function DonorLiveTrackingScreen() {
       const token = await AsyncStorage.getItem("auth_token");
       if (!token) return;
 
-      await axios.put(
+      await axios.patch(
         `${BASE_URL}/blood_donation_requests/${requestId}/update_location`,
         {
           donor_latitude: latitude.toString(),

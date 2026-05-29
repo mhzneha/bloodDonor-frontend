@@ -366,7 +366,7 @@ export default function DonorRequestsScreen() {
       const token = await AsyncStorage.getItem("auth_token");
       if (!token) return;
 
-      await axios.put(
+      await axios.patch(
         `${BASE_URL}/blood_donation_requests/${requestId}`,
         { status },
         {

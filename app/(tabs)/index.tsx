@@ -145,7 +145,7 @@ export default function BloodDonorScreen() {
       // if (isDonor) {
       router.push("/blood-donor/request");
       // } else {
-      alert("Only registered donors can view incoming requests.");
+      // alert("Only registered donors can view incoming requests.");
       // }
     }
 
