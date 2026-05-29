@@ -1,7 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,8 +15,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+// import { MapPressEvent } from "react-native-maps";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+let MapView: any;
+let Marker: any;
+
+if (Platform.OS !== "web") {
+  const Maps = require("react-native-maps");
+  MapView = Maps.default;
+  Marker = Maps.Marker;
+}
+
+// Types
 interface BloodRequestPayload {
   blood_group: string;
   contact_number: string;
@@ -35,8 +46,7 @@ interface StoredUser {
   phone_number: string;
   is_admin: boolean;
 }
-
-// ── Constants ─────────────────────────────────────────────────────────────────
+// Constants
 const API_URL =
   "https://blood-donor-finder-be.onrender.com/api/v1/blood_requests";
 
@@ -52,7 +62,7 @@ const URGENCY_LEVELS: Array<{
   { value: "critical", label: "Critical", color: "#dc2626" },
 ];
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// Sub-components──────────────────────────────────────────────────────────
 const SectionLabel = ({ text }: { text: string }) => (
   <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest text-gray-900 uppercase">
     {text}
@@ -93,7 +103,7 @@ const Field = ({
   </View>
 );
 
-// ── Blood Group Dropdown ──────────────────────────────────────────────────────
+// Blood Group Dropdown────────────────────────────────────────────────────
 const BloodGroupDropdown = ({
   value,
   onChange,
@@ -173,7 +183,7 @@ const BloodGroupDropdown = ({
   );
 };
 
-// ── Main Screen ───────────────────────────────────────────────────────────────
+// Main Screen
 export default function CreateBloodRequest() {
   const router = useRouter();
 
@@ -189,7 +199,19 @@ export default function CreateBloodRequest() {
   const [longitude, setLongitude] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ── Field-level errors ────────────────────────────────────────────────────
+  const [selectedLocation, setSelectedLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  const [region, setRegion] = useState({
+    latitude: 27.7172,
+    longitude: 85.324,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
+
+  // Field-level errors
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const setFieldError = (field: string, msg: string) =>
@@ -202,7 +224,7 @@ export default function CreateBloodRequest() {
       return next;
     });
 
-  // ── Validate & collect all errors ─────────────────────────────────────────
+  // Validate & collect all errors
   const validateAll = (): boolean => {
     const errors: Record<string, string> = {};
 
@@ -239,7 +261,50 @@ export default function CreateBloodRequest() {
     return Object.keys(errors).length === 0;
   };
 
-  // ── Submit ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        Alert.alert("Permission denied", "Location permission is required");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+
+      setRegion({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      });
+
+      setSelectedLocation(coords);
+
+      // auto fill latitude longitude
+      setLatitude(coords.latitude.toString());
+      setLongitude(coords.longitude.toString());
+    })();
+  }, []);
+
+  const handleMapPress = (event: any) => {
+    const coords = event.nativeEvent.coordinate;
+
+    setSelectedLocation(coords);
+
+    setLatitude(coords.latitude.toString());
+    setLongitude(coords.longitude.toString());
+
+    clearFieldError("latitude");
+    clearFieldError("longitude");
+  };
+
+  // Submit
   const handleSubmit = async () => {
     if (!validateAll()) return; // show inline errors, stop here
 
@@ -314,7 +379,7 @@ export default function CreateBloodRequest() {
     }
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // Render
   return (
     <KeyboardAvoidingView
       className="flex-1 "
@@ -439,7 +504,7 @@ export default function CreateBloodRequest() {
             ))}
           </View>
 
-          <SectionLabel text="Location" />
+          {/* <SectionLabel text="Location" />
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Field
@@ -467,7 +532,67 @@ export default function CreateBloodRequest() {
                 error={fieldErrors.longitude}
               />
             </View>
+          </View> */}
+
+          <SectionLabel text="Location" />
+
+          <Text className="mb-2 text-sm font-medium text-black-200">
+            Tap on map to select location *
+          </Text>
+
+          {Platform.OS === "web" ? (
+            <View className="items-center justify-center h-48 border border-gray-700 rounded-2xl">
+              <Text className="text-gray-500">
+                Map is only available on Android/iOS
+              </Text>
+            </View>
+          ) : (
+            <View className="overflow-hidden border border-gray-700 h-72 rounded-2xl">
+              <MapView
+                style={{ flex: 1 }}
+                initialRegion={region}
+                region={region}
+                onPress={handleMapPress}
+                showsUserLocation
+                showsMyLocationButton
+              >
+                {selectedLocation && (
+                  <Marker
+                    coordinate={selectedLocation}
+                    title="Selected Location"
+                  />
+                )}
+              </MapView>
+            </View>
+          )}
+
+          <View className="p-4 mt-3 border border-gray-700 rounded-2xl bg-gray-800/30">
+            <Text className="text-sm text-gray-300">
+              Latitude:{" "}
+              <Text className="font-bold text-white">
+                {latitude || "Not selected"}
+              </Text>
+            </Text>
+
+            <Text className="mt-2 text-sm text-gray-300">
+              Longitude:{" "}
+              <Text className="font-bold text-white">
+                {longitude || "Not selected"}
+              </Text>
+            </Text>
           </View>
+
+          {fieldErrors.latitude ? (
+            <Text className="mt-1 text-xs text-red-400">
+              {fieldErrors.latitude}
+            </Text>
+          ) : null}
+
+          {fieldErrors.longitude ? (
+            <Text className="mt-1 text-xs text-red-400">
+              {fieldErrors.longitude}
+            </Text>
+          ) : null}
 
           <TouchableOpacity
             onPress={handleSubmit}

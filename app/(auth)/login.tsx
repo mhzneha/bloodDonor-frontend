@@ -1,3 +1,4 @@
+import Logo from "@/components/Logo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError } from "axios";
 import { Link, useRouter } from "expo-router";
@@ -109,9 +110,7 @@ export default function Login() {
   return (
     <SafeAreaView className="flex justify-center w-full h-full">
       <View className="p-4">
-        <Text className="mb-5 text-2xl font-bold text-center dark:text-white">
-          Logo
-        </Text>
+        <Logo/>
         <Text className="mb-2 text-3xl font-bold text-center dark:text-white">
           Welcome Back!
         </Text>

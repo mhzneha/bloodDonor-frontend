@@ -60,7 +60,7 @@ export default function RequestCard({
         <TouchableOpacity
           onPress={() =>
             router.push({
-              pathname: "/blood-request/[id]",
+              pathname: "/(tabs)/blood-request/[id]",
               params: { id: item.id },
             })
           }
