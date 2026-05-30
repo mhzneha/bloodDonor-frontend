@@ -6,8 +6,8 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -71,7 +71,7 @@ export default function BloodDonorScreen() {
       const token = await AsyncStorage.getItem("auth_token");
 
       const res = await axios.get(
-        "http://192.168.101.18:3000/api/v1/blood_requests",
+        "https://blood-donor-finder-be.onrender.com/api/v1/blood_requests",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -116,22 +116,40 @@ export default function BloodDonorScreen() {
   // useEffect(() => {
   //   fetchRequests();
   // }, []);
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const storedUser = await AsyncStorage.getItem("user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-        }
-      } catch (e) {
-        console.log("User load error:", e);
-      }
-    };
+  // useEffect(() => {
+  //   const loadUser = async () => {
+  //     try {
+  //       const storedUser = await AsyncStorage.getItem("user");
+  //       if (storedUser) {
+  //         const parsedUser = JSON.parse(storedUser);
+  //         setUser(parsedUser);
+  //       }
+  //     } catch (e) {
+  //       console.log("User load error:", e);
+  //     }
+  //   };
 
-    loadUser();
-    fetchRequests();
-  }, []);
+  //   loadUser();
+  //   fetchRequests();
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        try {
+          const storedUser = await AsyncStorage.getItem("user");
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+          }
+        } catch (e) {
+          console.log("User load error:", e);
+        }
+      };
+
+      loadUser();
+      fetchRequests();
+    }, []),
+  );
 
   const handleCategoryPress = async (id: string) => {
     // const user = await AsyncStorage.getItem("user");

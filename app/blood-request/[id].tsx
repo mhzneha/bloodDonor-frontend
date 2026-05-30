@@ -3,12 +3,12 @@ import axios from "axios";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 type BloodRequest = {
@@ -38,7 +38,7 @@ export default function RequestDetail() {
       const token = await AsyncStorage.getItem("auth_token");
 
       const res = await axios.get(
-        "http://192.168.101.18:3000/api/v1/blood_requests",
+        "https://blood-donor-finder-be.onrender.com/api/v1/blood_requests",
         {
           headers: {
             Authorization: `Bearer ${token}`,

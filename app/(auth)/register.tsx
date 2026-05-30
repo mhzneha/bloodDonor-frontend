@@ -45,7 +45,7 @@ interface RegisterErrorResponse {
   errors: string[];
 }
 
-const API_URL = "http://192.168.101.18:3000/users";
+const API_URL = "https://blood-donor-finder-be.onrender.com/users";
 
 export default function Register() {
   const [fullName, setFullName] = useState<string>("");
@@ -114,10 +114,9 @@ export default function Register() {
   };
 
   return (
-    // ✅ flex-1 here so it fills the screen
-    <SafeAreaView className="flex-1 bg-gray-100 dark:bg-gray-900">
+    <SafeAreaView className="bg-gray-100 dark:bg-gray-900">
       {/* ✅ Header sits outside KeyboardAvoidingView so it never gets pushed */}
-      <View className="flex-row items-center px-4 py-6">
+      <View className="flex-row items-center px-4 py-1">
         <TouchableOpacity onPress={() => router.back()}>
           <FontAwesome6
             name="angle-left"
@@ -132,7 +131,7 @@ export default function Register() {
 
       {/* ✅ flex-1 so it takes remaining space after the header */}
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        // style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >

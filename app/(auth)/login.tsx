@@ -42,7 +42,7 @@ interface LoginErrorResponse {
   error?: string;
 }
 
-const API_URL = "http://192.168.101.18:3000/users/sign_in";
+const API_URL = "https://blood-donor-finder-be.onrender.com/users/sign_in";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -191,9 +191,9 @@ export default function Login() {
         <View>
           <Text className="my-5 text-center dark:text-white">
             Don't Have an Account?{" "}
-            <Link href="/register" className="underline text-primary-100">
-              Register
-            </Link>
+            <Pressable onPress={() => router.push("/register")}>
+              <Text className="underline text-primary-100">Register</Text>
+            </Pressable>
           </Text>
         </View>
       </View>

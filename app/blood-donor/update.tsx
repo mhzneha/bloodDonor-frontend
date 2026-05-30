@@ -34,7 +34,8 @@ interface DonorProfile {
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const API_URL = "http://192.168.101.18:3000/api/v1/donor_profile";
+const API_URL =
+  "https://blood-donor-finder-be.onrender.com/api/v1/donor_profile";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 

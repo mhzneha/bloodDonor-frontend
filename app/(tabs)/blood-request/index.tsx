@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 const API_URL =
-  "http://192.168.101.18:3000/api/v1/blood_requests";
+  "https://blood-donor-finder-be.onrender.com/api/v1/blood_requests";
 
 export default function BloodRequestIndex() {
   const [data, setData] = useState<any[]>([]);
@@ -64,7 +64,7 @@ export default function BloodRequestIndex() {
       >
         {/* Header */}
         <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-[17px] font-bold text-gray-900">
+          <Text className="text-[17px] font-bold text-gray-900 dark:text-gray-200">
             Blood Request
           </Text>
 
@@ -83,6 +83,7 @@ export default function BloodRequestIndex() {
               location: item.hospital_name,
               time: new Date(item.created_at).toLocaleString(),
               bloodGroup: item.blood_group,
+              phone_number: item.contact_number,
             }}
           />
         ))}
@@ -91,7 +92,7 @@ export default function BloodRequestIndex() {
       {/* Floating Add Button */}
       <TouchableOpacity
         onPress={() => router.push("/blood-request/create")}
-        className="absolute bottom-6 right-6 bg-primary-200  px-5 py-3 rounded-xl"
+        className="absolute px-5 py-3 bottom-6 right-6 bg-primary-200 rounded-xl"
       >
         <Text className="font-bold text-white">+ Add Request</Text>
       </TouchableOpacity>

@@ -278,15 +278,15 @@ import axios from "axios";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    RefreshControl,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
-const BASE_URL = "http://192.168.101.18:3000/api/v1";
+const BASE_URL = "https://blood-donor-finder-be.onrender.com/api/v1";
 
 interface DonationRequest {
   id: number;

@@ -1,7 +1,7 @@
 import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 
 export default function TabLayout() {
@@ -10,32 +10,32 @@ export default function TabLayout() {
 
   if (!isAuthenticated) return <Redirect href="/login" />;
 
+  const tintColor = Colors[colorScheme ?? "light"].tint;
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
+        tabBarActiveTintColor: "#ED3632",
         tabBarButton: HapticTab,
       }}
     >
-      {/* Home */}
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={24} color={color} />
           ),
         }}
       />
 
-      {/* Blood Request */}
       <Tabs.Screen
         name="blood-request"
         options={{
           title: "Requests",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="drop.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="water" size={24} color={color} />
           ),
         }}
       />
@@ -44,20 +44,26 @@ export default function TabLayout() {
         name="all-donor"
         options={{
           title: "Donors",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.2.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="people" size={24} color={color} />
           ),
         }}
       />
 
-      {/* Profile */}
       <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={24} color={color} />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="blood-donor"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

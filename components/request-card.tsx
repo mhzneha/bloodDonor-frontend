@@ -97,12 +97,12 @@ export default function RequestCard({
           // </TouchableOpacity>
           <TouchableOpacity
             onPress={callDonor}
-            className="flex-1 flex-row items-center justify-center rounded-xl py-2.5 bg-primary-200"
+            className="flex-1 flex-row items-center justify-center rounded-xl py-2.5 border border-primary-200"
             style={{ gap: 6 }}
             activeOpacity={0.85}
           >
-            <FontAwesome6 name="phone-volume" size={15} color="#ffffff" />
-            <Text className="text-sm font-bold text-white">Call</Text>
+            <FontAwesome6 name="phone-volume" size={15} color="#ED3632" />
+            <Text className="text-sm font-bold text-primary-200">Call</Text>
           </TouchableOpacity>
         )}
 

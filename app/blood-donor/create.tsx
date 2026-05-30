@@ -38,7 +38,7 @@ interface DonorProfilePayload {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const API_URL =
-  "http://192.168.101.18:3000/api/v1/donor_profile";
+  "https://blood-donor-finder-be.onrender.com/api/v1/donor_profile";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -422,19 +422,19 @@ export default function BecomeDonor() {
 
     if (!bloodGroup) errors.bloodGroup = "Please select your blood group.";
 
-    if (!location.trim()) errors.location = "Location name is required.";
+    // if (!location.trim()) errors.location = "Location name is required.";
 
-    if (!latitude.trim()) {
-      errors.latitude = "Latitude is required.";
-    } else if (isNaN(Number(latitude))) {
-      errors.latitude = "Must be a valid number.";
-    }
+    // if (!latitude.trim()) {
+    //   errors.latitude = "Latitude is required.";
+    // } else if (isNaN(Number(latitude))) {
+    //   errors.latitude = "Must be a valid number.";
+    // }
 
-    if (!longitude.trim()) {
-      errors.longitude = "Longitude is required.";
-    } else if (isNaN(Number(longitude))) {
-      errors.longitude = "Must be a valid number.";
-    }
+    // if (!longitude.trim()) {
+    //   errors.longitude = "Longitude is required.";
+    // } else if (isNaN(Number(longitude))) {
+    //   errors.longitude = "Must be a valid number.";
+    // }
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -473,6 +473,25 @@ export default function BecomeDonor() {
 
       console.log("SENDING:", payload);
 
+      // const response = await axios.post(API_URL, payload, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //     "Content-Type": "application/json",
+      //     Accept: "application/json",
+      //   },
+      // });
+
+      // console.log("SUCCESS:", response.data);
+
+      // router.replace("/(tabs)");
+
+      // setTimeout(() => {
+      //   Alert.alert(
+      //     "Welcome, Donor!",
+      //     "Your donor profile has been created. You may now receive donation requests.",
+      //   );
+      // }, 300);
+
       const response = await axios.post(API_URL, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -483,14 +502,29 @@ export default function BecomeDonor() {
 
       console.log("SUCCESS:", response.data);
 
-      router.replace("/(tabs)");
+      // ✅ UPDATE USER IN ASYNC STORAGE
+      const storedUser = await AsyncStorage.getItem("user");
 
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+
+        const updatedUser = {
+          ...parsedUser,
+          is_donor: true, // 👈 KEY FIX
+        };
+
+        await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+
+      // optional small delay for UI sync
       setTimeout(() => {
-        Alert.alert(
-          "Welcome, Donor! 🩸",
-          "Your donor profile has been created. You may now receive donation requests.",
-        );
-      }, 300);
+        router.replace("/(tabs)");
+      }, 200);
+
+      Alert.alert(
+        "Welcome, Donor!",
+        "Your donor profile has been created successfully.",
+      );
     } catch (err: any) {
       console.log("ERROR:", err?.response?.data);
       const msg =
