@@ -31,7 +31,7 @@ interface DonorProfile {
 
 //  Constants
 const API_URL =
-  "https://blood-donor-finder-be.onrender.com/api/v1/donor_profile";
+  "http://192.168.101.18:3000/api/v1/donor_profile";
 
 const BLOOD_GROUP_COLORS: Record<string, string> = {
   "A+": "#ef4444",

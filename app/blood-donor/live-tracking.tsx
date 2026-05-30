@@ -3,21 +3,74 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { getDistance } from "geolib";
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, AppState, Text, TouchableOpacity, View } from "react-native";
+import { Alert, AppState, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import Toast from "react-native-toast-message";
 
-const BASE_URL = "https://blood-donor-finder-be.onrender.com/api/v1";
+const BASE_URL = "http://192.168.101.18:3000/api/v1";
 
 export default function DonorLiveTrackingScreen() {
   const { requestId } = useLocalSearchParams<{ requestId: string }>();
   const router = useRouter();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [tracking, setTracking] = useState(false);
+  const [data, setData] = useState<any>(null);
   const [lastCoords, setLastCoords] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
+
+  const donation = data?.donation_request;
+  const bloodRequest = data?.blood_request;
+
+  const donorLat = parseFloat(donation?.donor_latitude ?? "0");
+  const donorLng = parseFloat(donation?.donor_longitude ?? "0");
+
+  const requesterLat = parseFloat(bloodRequest?.latitude ?? "0");
+  const requesterLng = parseFloat(bloodRequest?.longitude ?? "0");
+
+  const distanceMeters =
+    !isNaN(donorLat) &&
+    !isNaN(donorLng) &&
+    !isNaN(requesterLat) &&
+    !isNaN(requesterLng)
+      ? getDistance(
+          {
+            latitude: donorLat,
+            longitude: donorLng,
+          },
+          {
+            latitude: requesterLat,
+            longitude: requesterLng,
+          },
+        )
+      : 0;
+
+  const distanceKm =
+    distanceMeters > 0 ? (distanceMeters / 1000).toFixed(2) : "0.00";
+
+  const fetchTrackingData = async () => {
+    const token = await AsyncStorage.getItem("auth_token");
+
+    if (!token) return;
+
+    const res = await axios.get(
+      `${BASE_URL}/blood_donation_requests/${requestId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    setData(res.data);
+  };
+
+  useEffect(() => {
+    fetchTrackingData();
+  }, []);
 
   const updateLocation = async () => {
     try {
@@ -33,6 +86,12 @@ export default function DonorLiveTrackingScreen() {
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
+
+      console.log("donorLat:", donorLat);
+      console.log("donorLng:", donorLng);
+      console.log("requesterLat:", requesterLat);
+      console.log("requesterLng:", requesterLng);
+      console.log("lastCoords:", lastCoords);
 
       const { latitude, longitude } = location.coords;
       setLastCoords({ lat: latitude, lng: longitude });
@@ -95,54 +154,123 @@ export default function DonorLiveTrackingScreen() {
     return () => sub.remove();
   }, [tracking]);
 
+  const styles = StyleSheet.create({
+    liveMarker: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: "rgba(220,38,38,0.3)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+
+    liveDot: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      backgroundColor: "#dc2626",
+    },
+  });
+
+  if (!data || !data.donation_request || !data.blood_request) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading map...</Text>
+      </View>
+    );
+  }
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 32,
-      }}
-    >
-      <Text style={{ fontSize: 48, marginBottom: 16 }}>📍</Text>
-      <Text style={{ fontSize: 22, fontWeight: "800", marginBottom: 8 }}>
-        {tracking ? "Sharing Location" : "Tracking Paused"}
-      </Text>
-      <Text style={{ color: "#6b7280", textAlign: "center", marginBottom: 24 }}>
-        {tracking
-          ? "The requester can see your real-time location."
-          : "Tap below to resume sharing your location."}
-      </Text>
+    <View style={{ flex: 1 }}>
+      {/* MAP */}
+      <MapView
+        style={{ flex: 1 }}
+        initialRegion={{
+          latitude: requesterLat || donorLat || 27.7172,
+          longitude: requesterLng || donorLng || 85.324,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+      >
+        {/* 🔴 Donor */}
+        {lastCoords && (
+          <Marker
+            coordinate={{
+              latitude: lastCoords.lat,
+              longitude: lastCoords.lng,
+            }}
+          >
+            <View style={styles.liveMarker}>
+              <View style={styles.liveDot} />
+            </View>
+          </Marker>
+        )}
 
-      {lastCoords && (
-        <Text style={{ color: "#9ca3af", fontSize: 12, marginBottom: 24 }}>
-          Last: {lastCoords.lat.toFixed(5)}, {lastCoords.lng.toFixed(5)}
-        </Text>
-      )}
+        {/* 🟦 Requester */}
+        {requesterLat && requesterLng && (
+          <Marker
+            coordinate={{
+              latitude: requesterLat,
+              longitude: requesterLng,
+            }}
+            title={bloodRequest?.hospital_name || "Requester"}
+            pinColor="blue"
+          />
+        )}
+      </MapView>
 
-      <TouchableOpacity
-        onPress={tracking ? stopTracking : startTracking}
+      {/* FLOATING CONTROL PANEL */}
+      <View
         style={{
-          backgroundColor: tracking ? "#dc2626" : "#16a34a",
-          paddingVertical: 14,
-          paddingHorizontal: 40,
-          borderRadius: 14,
-          marginBottom: 12,
+          position: "absolute",
+          bottom: 40,
+          left: 20,
+          right: 20,
+          backgroundColor: "white",
+          padding: 16,
+          borderRadius: 16,
+          elevation: 5,
         }}
       >
-        <Text style={{ color: "#fff", fontWeight: "800", fontSize: 16 }}>
-          {tracking ? "Stop Tracking" : "Resume Tracking"}
+        <Text style={{ fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
+          {tracking ? "Sharing Location 📡" : "Tracking Paused"}
         </Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => {
-          stopTracking();
-          router.back();
-        }}
-      >
-        <Text style={{ color: "#6b7280", marginTop: 8 }}>Done / Go back</Text>
-      </TouchableOpacity>
+        <Text style={{ marginBottom: 8, color: "#6b7280" }}>
+          {`Distance: ${distanceKm} km`}
+        </Text>
+
+        <Text style={{ color: "#6b7280", marginBottom: 10 }}>
+          {lastCoords
+            ? `${lastCoords.lat.toFixed(5)}, ${lastCoords.lng.toFixed(5)}`
+            : "Waiting for location..."}
+        </Text>
+
+        <TouchableOpacity
+          onPress={tracking ? stopTracking : startTracking}
+          style={{
+            backgroundColor: tracking ? "#dc2626" : "#16a34a",
+            padding: 12,
+            borderRadius: 10,
+            marginBottom: 8,
+          }}
+        >
+          <Text
+            style={{ color: "white", textAlign: "center", fontWeight: "700" }}
+          >
+            {tracking ? "Stop Tracking" : "Start Tracking"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            stopTracking();
+            router.back();
+          }}
+        >
+          <Text style={{ textAlign: "center", color: "#6b7280" }}>Go Back</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

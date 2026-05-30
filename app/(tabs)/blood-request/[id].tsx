@@ -38,7 +38,7 @@ export default function RequestDetail() {
       const token = await AsyncStorage.getItem("auth_token");
 
       const res = await axios.get(
-        "https://blood-donor-finder-be.onrender.com/api/v1/blood_requests",
+        "http://192.168.101.18:3000/api/v1/blood_requests",
         {
           headers: {
             Authorization: `Bearer ${token}`,

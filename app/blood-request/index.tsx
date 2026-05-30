@@ -10,8 +10,7 @@ import {
   View,
 } from "react-native";
 
-const API_URL =
-  "https://blood-donor-finder-be.onrender.com/api/v1/blood_requests";
+const API_URL = "http://192.168.101.18:3000/api/v1/blood_requests";
 
 export default function BloodRequestIndex() {
   const [data, setData] = useState<any[]>([]);
