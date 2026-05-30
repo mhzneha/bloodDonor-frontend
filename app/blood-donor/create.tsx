@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -13,10 +13,18 @@ import {
   ScrollView,
   Switch,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
+let MapView: any;
+let Marker: any;
+
+if (Platform.OS !== "web") {
+  const Maps = require("react-native-maps");
+  MapView = Maps.default;
+  Marker = Maps.Marker;
+}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface DonorProfilePayload {
@@ -36,7 +44,7 @@ const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const SectionLabel = ({ text }: { text: string }) => (
-  <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest text-gray-900 uppercase">
+  <Text className="mt-5 mb-2 text-sm font-extrabold tracking-widest text-gray-900 uppercase dark:text-gray-400">
     {text}
   </Text>
 );
@@ -310,6 +318,17 @@ export default function BecomeDonor() {
 
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  const [selectedLocation, setSelectedLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  const [region, setRegion] = useState({
+    latitude: 27.7172,
+    longitude: 85.324,
+    latitudeDelta: 0.05,
+    longitudeDelta: 0.05,
+  });
   const clearFieldError = (field: string) =>
     setFieldErrors((prev) => {
       const next = { ...prev };
@@ -354,6 +373,49 @@ export default function BecomeDonor() {
     }
   };
 
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        Alert.alert("Permission denied", "Location permission is required");
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+
+      setRegion({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      });
+
+      setSelectedLocation(coords);
+
+      // auto fill latitude longitude
+      setLatitude(coords.latitude.toString());
+      setLongitude(coords.longitude.toString());
+    })();
+  }, []);
+
+  const handleMapPress = (event: any) => {
+    const coords = event.nativeEvent.coordinate;
+
+    setSelectedLocation(coords);
+
+    setLatitude(coords.latitude.toString());
+    setLongitude(coords.longitude.toString());
+
+    clearFieldError("latitude");
+    clearFieldError("longitude");
+  };
+
   // ── Validation ────────────────────────────────────────────────────────────
   const validateAll = (): boolean => {
     const errors: Record<string, string> = {};
@@ -377,6 +439,13 @@ export default function BecomeDonor() {
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
+  // const handleMapPress = (event: any) => {
+  //   const { latitude, longitude } = event.nativeEvent.coordinate;
+
+  //   setLatitude(latitude.toString());
+  //   setLongitude(longitude.toString());
+  // };
 
   // ── Submit ────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
@@ -519,10 +588,10 @@ export default function BecomeDonor() {
           </Text>
 
           {/* Location */}
-          <SectionLabel text="Location" />
+          {/* <SectionLabel text="Location" /> */}
 
           {/* Detect button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={detectLocation}
             disabled={locLoading}
             className="flex-row items-center justify-center gap-2 py-3 mb-3 border border-gray-700 rounded-xl"
@@ -548,10 +617,10 @@ export default function BecomeDonor() {
                 </Text>
               </>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {/* Location name */}
-          <View className="mb-3">
+          {/* <View className="mb-3">
             <Text className="mb-1 text-sm font-medium text-black-200">
               Location Name *
             </Text>
@@ -576,10 +645,10 @@ export default function BecomeDonor() {
                 {fieldErrors.location}
               </Text>
             ) : null}
-          </View>
+          </View> */}
 
           {/* Lat / Lng */}
-          <View className="flex-row gap-3">
+          {/* <View className="flex-row gap-3">
             <View className="flex-1">
               <Text className="mb-1 text-sm font-medium text-black-200">
                 Latitude *
@@ -626,17 +695,76 @@ export default function BecomeDonor() {
                 </Text>
               ) : null}
             </View>
+          </View> */}
+
+          {/* <SectionLabel text="Location" />
+
+          <Text className="mb-2 text-sm font-medium text-black-200">
+            Tap on map to select location *
+          </Text>
+
+          {Platform.OS === "web" ? (
+            <View className="items-center justify-center h-48 border border-gray-700 rounded-2xl">
+              <Text className="text-gray-500">
+                Map is only available on Android/iOS
+              </Text>
+            </View>
+          ) : (
+            <View className="overflow-hidden border border-gray-700 h-72 rounded-2xl">
+              <MapView
+                style={{ flex: 1 }}
+                initialRegion={region}
+                region={region}
+                onPress={handleMapPress}
+                showsUserLocation
+                showsMyLocationButton
+              >
+                {selectedLocation && (
+                  <Marker
+                    coordinate={selectedLocation}
+                    title="Selected Location"
+                  />
+                )}
+              </MapView>
+            </View>
+          )}
+          <View className="p-4 mt-3 border border-gray-700 rounded-2xl bg-gray-800/30">
+            <Text className="text-sm text-gray-300">
+              Latitude:{" "}
+              <Text className="font-bold text-white">
+                {latitude || "Not selected"}
+              </Text>
+            </Text>
+
+            <Text className="mt-2 text-sm text-gray-300">
+              Longitude:{" "}
+              <Text className="font-bold text-white">
+                {longitude || "Not selected"}
+              </Text>
+            </Text>
           </View>
 
+          {fieldErrors.latitude ? (
+            <Text className="mt-1 text-xs text-red-400">
+              {fieldErrors.latitude}
+            </Text>
+          ) : null}
+
+          {fieldErrors.longitude ? (
+            <Text className="mt-1 text-xs text-red-400">
+              {fieldErrors.longitude}
+            </Text>
+          ) : null} */}
+
           {/* GPS filled indicator */}
-          {latitude && longitude ? (
+          {/* {latitude && longitude ? (
             <View className="flex-row items-center gap-2 px-3 py-2 mt-2 mb-1 rounded-lg bg-green-900/30">
               <Text className="text-xs text-green-400">✓</Text>
               <Text className="text-xs font-medium text-green-400">
                 GPS coordinates set — {latitude}, {longitude}
               </Text>
             </View>
-          ) : null}
+          ) : null} */}
 
           {/* Submit */}
           <TouchableOpacity

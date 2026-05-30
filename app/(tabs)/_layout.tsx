@@ -40,7 +40,7 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="blood-donor"
         options={{
           title: "Donors",
@@ -48,7 +48,7 @@ export default function TabLayout() {
             <IconSymbol size={28} name="person.2.fill" color={color} />
           ),
         }}
-      />
+      /> */}
 
       {/* Profile */}
       <Tabs.Screen

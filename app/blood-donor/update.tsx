@@ -1,3 +1,4 @@
+import { FontAwesome6, Fontisto } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as Location from "expo-location";
@@ -12,12 +13,11 @@ import {
   ScrollView,
   Switch,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+//  Types
 interface DonorProfile {
   id: number;
   available: boolean | null;
@@ -33,7 +33,7 @@ interface DonorProfile {
   last_active_at: string | null;
 }
 
-// ── Constants ─────────────────────────────────────────────────────────────────
+//  Constants
 const API_URL =
   "https://blood-donor-finder-be.onrender.com/api/v1/donor_profile";
 
@@ -54,14 +54,14 @@ const MONTHS = [
   "Dec",
 ];
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+//  Sub-components
 const SectionLabel = ({ text }: { text: string }) => (
-  <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">
+  <Text className="mt-5 mb-2 text-sm font-extrabold tracking-widest text-gray-900 uppercase dark:text-gray-400">
     {text}
   </Text>
 );
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
+//  Skeleton
 const Skeleton = ({
   w,
   h,
@@ -76,7 +76,7 @@ const Skeleton = ({
       width: w as any,
       height: h,
       borderRadius: rounded,
-      backgroundColor: "#1f2937",
+      backgroundColor: "#e5e7eb",
     }}
   />
 );
@@ -103,7 +103,7 @@ const FormSkeleton = () => (
   </View>
 );
 
-// ── Blood Group Dropdown ──────────────────────────────────────────────────────
+// Blood Group Dropdown
 const BloodGroupDropdown = ({
   value,
   onChange,
@@ -116,18 +116,20 @@ const BloodGroupDropdown = ({
   const [open, setOpen] = useState(false);
   return (
     <View className="mb-3">
-      <Text className="mb-1 text-sm font-medium text-gray-300">
+      <Text className="mb-1 text-sm font-medium text-gray-600 dark:text-gray-400">
         Blood Group *
       </Text>
       <TouchableOpacity
         onPress={() => setOpen(true)}
-        className={`flex-row items-center justify-between px-4 py-3 bg-gray-800 border rounded-xl ${
+        className={`flex-row items-center justify-between px-4 py-3  border rounded-xl ${
           error ? "border-red-500" : "border-gray-700"
         }`}
         activeOpacity={0.8}
       >
         <Text
-          className={value ? "text-white text-base" : "text-gray-500 text-base"}
+          className={
+            value ? "text-gray-500 text-base" : "text-gray-400 text-base"
+          }
         >
           {value || "Select your blood group"}
         </Text>
@@ -175,7 +177,7 @@ const BloodGroupDropdown = ({
   );
 };
 
-// ── Date Picker ───────────────────────────────────────────────────────────────
+//  Date Picker
 const DatePickerField = ({
   label,
   value,
@@ -210,7 +212,8 @@ const DatePickerField = ({
   const confirm = () => {
     const mm = String(selMonth + 1).padStart(2, "0");
     const dd = String(selDay).padStart(2, "0");
-    onChange(`${selYear}-${mm}-${dd}`);
+    // onChange(`${selYear}-${mm}-${dd}`);
+    onChange(new Date(selYear, selMonth, selDay).toISOString().split("T")[0]);
     setOpen(false);
   };
 
@@ -224,22 +227,24 @@ const DatePickerField = ({
 
   return (
     <View className="mb-3">
-      <Text className="mb-1 text-sm font-medium text-gray-300">{label}</Text>
+      <Text className="mb-1 text-sm font-medium text-gray-600 dark:text-gray-400">
+        {label}
+      </Text>
       <TouchableOpacity
         onPress={() => setOpen(true)}
-        className={`flex-row items-center justify-between px-4 py-3 bg-gray-800 border rounded-xl ${
+        className={`flex-row items-center justify-between px-4 py-3  border rounded-xl ${
           error ? "border-red-500" : "border-gray-700"
         }`}
         activeOpacity={0.8}
       >
         <Text
           className={
-            displayValue ? "text-white text-base" : "text-gray-500 text-base"
+            displayValue ? "text-gray-500 text-base" : "text-gray-400 text-base"
           }
         >
           {displayValue || "Select date (optional)"}
         </Text>
-        <Text className="text-lg">📅</Text>
+        <FontAwesome6 name="calendar-days" size={15} color="#4b5563" />
       </TouchableOpacity>
       {value && (
         <TouchableOpacity
@@ -331,7 +336,7 @@ const DatePickerField = ({
   );
 };
 
-// ── Main Screen ───────────────────────────────────────────────────────────────
+//  Main Screen
 export default function UpdateDonorProfile() {
   const router = useRouter();
 
@@ -353,7 +358,7 @@ export default function UpdateDonorProfile() {
   // Track what was originally loaded so we can show a "no changes" hint
   const [original, setOriginal] = useState<Partial<DonorProfile>>({});
 
-  // ── Fetch existing profile ────────────────────────────────────────────────
+  //  Fetch existing profile
   const loadProfile = useCallback(async () => {
     try {
       setFetchLoading(true);
@@ -378,7 +383,10 @@ export default function UpdateDonorProfile() {
       setLocation(data.location ?? "");
       setLatitude(data.latitude ?? "");
       setLongitude(data.longitude ?? "");
-      setLastDonatedAt(data.last_donated_at ?? null);
+      // setLastDonatedAt(data.last_donated_at ?? null);
+      setLastDonatedAt(
+        data.last_donated_at ? data.last_donated_at.split("T")[0] : null,
+      );
       setOriginal(data);
     } catch (err: any) {
       const status = err?.response?.status;
@@ -413,7 +421,7 @@ export default function UpdateDonorProfile() {
     loadProfile();
   }, [loadProfile]);
 
-  // ── Detect location ───────────────────────────────────────────────────────
+  //  Detect location
   const detectLocation = async () => {
     try {
       setLocLoading(true);
@@ -449,7 +457,7 @@ export default function UpdateDonorProfile() {
     }
   };
 
-  // ── Validation ────────────────────────────────────────────────────────────
+  //  Validation
   const clearFieldError = (field: string) =>
     setFieldErrors((prev) => {
       const n = { ...prev };
@@ -460,18 +468,18 @@ export default function UpdateDonorProfile() {
   const validateAll = (): boolean => {
     const errors: Record<string, string> = {};
     if (!bloodGroup) errors.bloodGroup = "Please select your blood group.";
-    if (!location.trim()) errors.location = "Location name is required.";
-    if (!latitude.trim()) errors.latitude = "Latitude is required.";
-    else if (isNaN(Number(latitude)))
-      errors.latitude = "Must be a valid number.";
-    if (!longitude.trim()) errors.longitude = "Longitude is required.";
-    else if (isNaN(Number(longitude)))
-      errors.longitude = "Must be a valid number.";
-    setFieldErrors(errors);
+    // if (!location.trim()) errors.location = "Location name is required.";
+    // if (!latitude.trim()) errors.latitude = "Latitude is required.";
+    // else if (isNaN(Number(latitude)))
+    //   errors.latitude = "Must be a valid number.";
+    // if (!longitude.trim()) errors.longitude = "Longitude is required.";
+    // else if (isNaN(Number(longitude)))
+    //   errors.longitude = "Must be a valid number.";
+    // setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // ── Detect changed fields ─────────────────────────────────────────────────
+  //  Detect changed fields
   const hasChanges = (): boolean => {
     return (
       bloodGroup !== (original.blood_group ?? "") ||
@@ -483,7 +491,7 @@ export default function UpdateDonorProfile() {
     );
   };
 
-  // ── Submit (PATCH) ────────────────────────────────────────────────────────
+  //  Submit (PATCH)
   const handleSubmit = async () => {
     if (!validateAll()) return;
 
@@ -508,13 +516,15 @@ export default function UpdateDonorProfile() {
           location: location.trim(),
           latitude,
           longitude,
-          last_donated_at: lastDonatedAt,
+          // last_donated_at: lastDonatedAt ? lastDonatedAt : null,
+          last_donated_at: lastDonatedAt ? lastDonatedAt + "T00:00:00Z" : null,
         },
       };
 
-      console.log("PATCHING:", payload);
+      // console.log("PATCHING:", payload);
+      console.log("LAST DONATED RAW:", lastDonatedAt);
 
-      const res = await axios.patch(API_URL, payload, {
+      const res = await axios.put(API_URL, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -534,7 +544,7 @@ export default function UpdateDonorProfile() {
 
       setTimeout(() => {
         Alert.alert(
-          "Updated! ✅",
+          "Updated!",
           "Your donor profile has been updated successfully.",
         );
       }, 300);
@@ -554,7 +564,7 @@ export default function UpdateDonorProfile() {
     }
   };
 
-  // ── Fetch error state ─────────────────────────────────────────────────────
+  //  Fetch error state
   if (fetchError) {
     return (
       <View
@@ -575,10 +585,10 @@ export default function UpdateDonorProfile() {
     );
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  //  Render
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-gray-950"
+      className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -587,15 +597,15 @@ export default function UpdateDonorProfile() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* ── Header ──────────────────────────────────────────────────────── */}
+        {/*  Header */}
         <View
-          className="px-6 py-8 shadow-lg rounded-b-3xl"
-          style={{ backgroundColor: "#4c0519" }}
+          className="px-6 py-8 shadow-lg rounded-b-3xl bg-primary-200/70"
+          // style={{ backgroundColor: "#4c0519" }}
         >
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center" style={{ gap: 12 }}>
               <View className="items-center justify-center w-10 h-10 rounded-full bg-white/20">
-                <Text style={{ fontSize: 18 }}>❤️</Text>
+                <Fontisto name="blood-drop" size={22} color="#ED3632" />
               </View>
               <View>
                 <Text className="text-sm font-medium text-white/70">
@@ -646,7 +656,7 @@ export default function UpdateDonorProfile() {
           )}
         </View>
 
-        {/* ── Form / Skeleton ──────────────────────────────────────────────── */}
+        {/*  Form / Skeleton  */}
         {fetchLoading ? (
           <FormSkeleton />
         ) : (
@@ -664,12 +674,12 @@ export default function UpdateDonorProfile() {
 
             {/* Availability */}
             <SectionLabel text="Availability" />
-            <View className="flex-row items-center justify-between px-4 py-4 mb-3 bg-gray-800 border border-gray-700 rounded-xl">
+            <View className="flex-row items-center justify-between px-4 py-4 mb-3 border border-gray-700 rounded-xl">
               <View style={{ flex: 1, marginRight: 12 }}>
-                <Text className="text-base font-semibold text-white">
+                <Text className="text-base font-semibold text-gray-500">
                   Available to donate
                 </Text>
-                <Text className="mt-0.5 text-xs text-gray-400">
+                <Text className="mt-0.5 text-xs text-gray-500">
                   {available
                     ? "You'll appear in donor searches"
                     : "You won't receive donation requests"}
@@ -678,8 +688,8 @@ export default function UpdateDonorProfile() {
               <Switch
                 value={available}
                 onValueChange={setAvailable}
-                trackColor={{ false: "#374151", true: "#be123c" }}
-                thumbColor={available ? "#fff" : "#9ca3af"}
+                trackColor={{ false: "#374151", true: "#9ca3af" }}
+                thumbColor={available ? "#EF5350" : "#9ca3af"}
               />
             </View>
 
@@ -696,7 +706,7 @@ export default function UpdateDonorProfile() {
             </Text>
 
             {/* Location */}
-            <SectionLabel text="Location" />
+            {/* <SectionLabel text="Location" />
             <TouchableOpacity
               onPress={detectLocation}
               disabled={locLoading}
@@ -718,10 +728,10 @@ export default function UpdateDonorProfile() {
                   </Text>
                 </>
               )}
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/* Location name */}
-            <View className="mb-3">
+            {/* <View className="mb-3">
               <Text className="mb-1 text-sm font-medium text-gray-300">
                 Location Name *
               </Text>
@@ -749,10 +759,10 @@ export default function UpdateDonorProfile() {
                   {fieldErrors.location}
                 </Text>
               ) : null}
-            </View>
+            </View> */}
 
             {/* Lat / Lng */}
-            <View className="flex-row" style={{ gap: 12 }}>
+            {/* <View className="flex-row" style={{ gap: 12 }}>
               <View style={{ flex: 1 }}>
                 <Text className="mb-1 text-sm font-medium text-gray-300">
                   Latitude *
@@ -799,10 +809,10 @@ export default function UpdateDonorProfile() {
                   </Text>
                 ) : null}
               </View>
-            </View>
+            </View> */}
 
             {/* GPS confirmed */}
-            {latitude && longitude ? (
+            {/* {latitude && longitude ? (
               <View
                 className="flex-row items-center px-3 py-2 mt-2 mb-1 rounded-lg"
                 style={{ backgroundColor: "rgba(20,83,45,0.4)", gap: 6 }}
@@ -812,16 +822,16 @@ export default function UpdateDonorProfile() {
                   GPS set — {latitude}, {longitude}
                 </Text>
               </View>
-            ) : null}
+            ) : null} */}
 
-            {/* ── Action buttons ───────────────────────────────────────────── */}
+            {/*  Action buttons  */}
             <View style={{ marginTop: 28, gap: 12 }}>
               {/* Save */}
               <TouchableOpacity
                 onPress={handleSubmit}
                 disabled={submitLoading}
                 className={`rounded-2xl py-4 items-center shadow-lg ${
-                  submitLoading ? "bg-rose-400" : "bg-rose-700"
+                  submitLoading ? "bg-rose-400" : "bg-primary-100"
                 }`}
                 activeOpacity={0.85}
               >
@@ -834,7 +844,7 @@ export default function UpdateDonorProfile() {
                   </View>
                 ) : (
                   <Text className="text-base font-bold tracking-wide text-white">
-                    ✅ Save Changes
+                    Save Changes
                   </Text>
                 )}
               </TouchableOpacity>
@@ -859,17 +869,17 @@ export default function UpdateDonorProfile() {
                     router.back();
                   }
                 }}
-                className="items-center py-4 bg-gray-800 border border-gray-700 rounded-2xl"
+                className="items-center py-4 border border-gray-700 rounded-2xl"
                 activeOpacity={0.85}
               >
-                <Text className="text-base font-bold text-gray-300">
-                  ✕ Discard & Go Back
+                <Text className="text-base font-bold text-gray-700 dark:text-gray-300">
+                  Discard & Go Back
                 </Text>
               </TouchableOpacity>
             </View>
 
             <Text className="mt-4 text-xs text-center text-gray-600">
-              Only fields you change will be updated on the server.
+              Only fields you change will be updated.
             </Text>
           </View>
         )}
