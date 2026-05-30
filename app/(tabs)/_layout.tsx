@@ -40,15 +40,15 @@ export default function TabLayout() {
         }}
       />
 
-      {/* <Tabs.Screen
-        name="blood-donor"
+      <Tabs.Screen
+        name="all-donor"
         options={{
           title: "Donors",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="person.2.fill" color={color} />
           ),
         }}
-      /> */}
+      />
 
       {/* Profile */}
       <Tabs.Screen

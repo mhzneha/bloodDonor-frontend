@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LoggedInUser } from "../types/user";
 
 interface LoginRequestBody {
   user: {
@@ -19,16 +20,16 @@ interface LoginRequestBody {
   };
 }
 
-interface LoggedInUser {
-  id: number;
-  email: string;
-  name: string;
-  phone_number: string;
-  is_admin: boolean;
-  created_at: string;
-  updated_at: string;
-  jti: string;
-}
+// interface LoggedInUser {
+//   id: number;
+//   email: string;
+//   name: string;
+//   phone_number: string;
+//   is_admin: boolean;
+//   created_at: string;
+//   updated_at: string;
+//   jti: string;
+// }
 
 interface LoginSuccessResponse {
   message: string;
@@ -79,8 +80,14 @@ export default function Login() {
       const { token, user } = response.data;
 
       // ✅ Save token and user to AsyncStorage
+
+      const safeUser = {
+        ...user,
+        is_donor: user?.is_donor ?? false,
+      };
       await AsyncStorage.setItem("auth_token", token);
-      await AsyncStorage.setItem("user", JSON.stringify(user));
+      // await AsyncStorage.setItem("user", JSON.stringify(user));
+      await AsyncStorage.setItem("user", JSON.stringify(safeUser));
 
       router.replace("/(tabs)");
     } catch (err) {
@@ -110,7 +117,7 @@ export default function Login() {
   return (
     <SafeAreaView className="flex justify-center w-full h-full">
       <View className="p-4">
-        <Logo/>
+        <Logo />
         <Text className="mb-2 text-3xl font-bold text-center dark:text-white">
           Welcome Back!
         </Text>

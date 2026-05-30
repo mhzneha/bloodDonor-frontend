@@ -1,5 +1,6 @@
 import "../global.css";
 
+import type { LoggedInUser } from "@/app/types/user";
 import RequestCard from "@/components/request-card";
 import { FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -44,30 +45,6 @@ const CATEGORIES = [
   { id: "4", label: "Donror", icon: "👤" },
 ];
 
-const BLOOD_REQUESTS: BloodRequest[] = [
-  {
-    id: "1",
-    name: "Aayan Shrestha",
-    location: "Gwarko, Lalitpur (2 min away)",
-    time: "5 min ago",
-    bloodGroup: "A+",
-  },
-  {
-    id: "2",
-    name: "Priya Maharjan",
-    location: "Pulchowk, Lalitpur (5 min away)",
-    time: "12 min ago",
-    bloodGroup: "O-",
-  },
-  {
-    id: "3",
-    name: "Rajan Thapa",
-    location: "Baneshwor, Kathmandu (10 min away)",
-    time: "20 min ago",
-    bloodGroup: "B+",
-  },
-];
-
 const AvatarPlaceholder = ({ className = "" }: { className?: string }) => (
   <View className={`rounded-full bg-gray-200 ${className}`} />
 );
@@ -83,6 +60,9 @@ export default function BloodDonorScreen() {
   const [search, setSearch] = useState("");
   const [requests, setRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<LoggedInUser | null>(null);
+  // const isDonor = !!user?.is_donor;
+  const isDonor = user?.is_donor === true;
 
   const fetchRequests = async () => {
     try {
@@ -122,6 +102,7 @@ export default function BloodDonorScreen() {
         location: item.hospital_name,
         time: new Date(item.created_at).toLocaleString(),
         bloodGroup: item.blood_group,
+        phone_number: item.contact_number,
       }));
 
       setRequests(formatted);
@@ -131,7 +112,24 @@ export default function BloodDonorScreen() {
       setLoading(false);
     }
   };
+
+  // useEffect(() => {
+  //   fetchRequests();
+  // }, []);
   useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        }
+      } catch (e) {
+        console.log("User load error:", e);
+      }
+    };
+
+    loadUser();
     fetchRequests();
   }, []);
 
@@ -247,26 +245,34 @@ export default function BloodDonorScreen() {
                   emergencies.
                 </Text>
                 <View className="flex-row gap-3 mt-3">
+                  {/* Keep Request Blood always visible */}
                   <Pressable
-                    onPress={() => {
-                      router.push("/blood-donor/create");
-                    }}
-                    className="px-3 py-1 bg-white rounded-xl w-fit"
-                  >
-                    <Text className="text-base font-semibold text-primary-100">
-                      Become Donor
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => {
-                      router.push("/blood-request/create");
-                    }}
-                    className="px-3 py-1 bg-white rounded-xl w-fit"
+                    onPress={() => router.push("/blood-request/create")}
+                    className="px-3 py-1 bg-white rounded-xl"
                   >
                     <Text className="text-base font-semibold text-primary-100">
                       Request Blood
                     </Text>
                   </Pressable>
+                  {user?.is_donor === true ? (
+                    <Pressable
+                      onPress={() => router.push("/blood-donor/detail")}
+                      className="px-3 py-1 bg-white rounded-xl"
+                    >
+                      <Text className="text-base font-semibold text-primary-100">
+                        View Donor Profile
+                      </Text>
+                    </Pressable>
+                  ) : (
+                    <Pressable
+                      onPress={() => router.push("/blood-donor/create")}
+                      className="px-3 py-1 bg-white rounded-xl"
+                    >
+                      <Text className="text-base font-semibold text-primary-100">
+                        Become Donor
+                      </Text>
+                    </Pressable>
+                  )}
                 </View>
               </View>
             </LinearGradient>

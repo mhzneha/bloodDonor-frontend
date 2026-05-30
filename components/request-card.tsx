@@ -1,7 +1,7 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Linking, Text, TouchableOpacity, View } from "react-native";
 
 export type BloodRequest = {
   id: string;
@@ -9,6 +9,7 @@ export type BloodRequest = {
   location: string;
   time: string;
   bloodGroup: string;
+  phone_number?: string;
 };
 
 type RequestCardProps = {
@@ -30,6 +31,11 @@ export default function RequestCard({
   item,
   isMyRequest = false,
 }: RequestCardProps) {
+  const callDonor = () => {
+    if (!item.phone_number) return;
+
+    Linking.openURL(`tel:${item.phone_number}`);
+  };
   return (
     <View className="p-4 mb-5 bg-gray-100 shadow-sm rounded-2xl elevation-2">
       {/* Top row */}
@@ -42,9 +48,9 @@ export default function RequestCard({
           </Text>
 
           <View className="flex-row items-center mb-0.5">
-            <Text className="mr-1 text-xs text-red-500">📍</Text>
+            <FontAwesome6 name="location-dot" size={12} color="#EF5350" solid />
 
-            <Text className="flex-shrink text-xs text-gray-500">
+            <Text className="flex-shrink pl-2 text-xs text-gray-500">
               {item.location}
             </Text>
           </View>
@@ -84,16 +90,25 @@ export default function RequestCard({
             </Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity className="flex-1 border border-red-400 rounded-xl py-2.5 items-center">
-            <Text className="text-sm font-semibold text-red-500">
-              Donate Blood
-            </Text>
+          // <TouchableOpacity className="flex-1 border border-red-400 rounded-xl py-2.5 items-center">
+          //   <Text className="text-sm font-semibold text-red-500">
+          //     Donate Blood
+          //   </Text>
+          // </TouchableOpacity>
+          <TouchableOpacity
+            onPress={callDonor}
+            className="flex-1 flex-row items-center justify-center rounded-xl py-2.5 bg-primary-200"
+            style={{ gap: 6 }}
+            activeOpacity={0.85}
+          >
+            <FontAwesome6 name="phone-volume" size={15} color="#ffffff" />
+            <Text className="text-sm font-bold text-white">Call</Text>
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity className="items-center justify-center border border-gray-200 w-11 h-11 rounded-xl">
+        {/* <TouchableOpacity className="items-center justify-center border border-gray-200 w-11 h-11 rounded-xl">
           <FontAwesome6 name="phone-volume" size={18} color="#1F1F1F" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
