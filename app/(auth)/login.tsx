@@ -1,4 +1,5 @@
 import Logo from "@/components/Logo";
+import { FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError } from "axios";
 import { Link, useRouter } from "expo-router";
@@ -49,6 +50,8 @@ export default function Login() {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<string[]>([]);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
 
@@ -152,7 +155,7 @@ export default function Login() {
             />
           </View>
 
-          <View>
+          {/* <View>
             <Text className="mb-2 dark:text-white">Password</Text>
             <TextInput
               className="p-4 text-black bg-gray-100 rounded-md dark:bg-gray-700 dark:text-white"
@@ -162,6 +165,32 @@ export default function Login() {
               value={password}
               onChangeText={(text: string) => setPassword(text)}
             />
+          </View> */}
+
+          <View>
+            <Text className="mb-2 dark:text-white">Password</Text>
+
+            <View className="relative">
+              <TextInput
+                className="p-4 pr-12 text-black bg-gray-100 rounded-md dark:bg-gray-700 dark:text-white"
+                placeholder="Password"
+                placeholderTextColor="#9CA3AF"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={(text: string) => setPassword(text)}
+              />
+
+              <Pressable
+                onPress={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-4"
+              >
+                <FontAwesome6
+                  name={showPassword ? "eye-slash" : "eye"}
+                  size={18}
+                  color="#666"
+                />
+              </Pressable>
+            </View>
           </View>
 
           <View className="flex-row justify-end py-5">
@@ -188,13 +217,12 @@ export default function Login() {
           </Pressable>
         </View>
 
-        <View>
-          <Text className="my-5 text-center dark:text-white">
-            Don't Have an Account?{" "}
-            <Pressable onPress={() => router.push("/register")}>
-              <Text className="underline text-primary-100">Register</Text>
-            </Pressable>
-          </Text>
+        <View className="flex-row items-center justify-center my-5">
+          <Text className="dark:text-white">Don't Have an Account? </Text>
+
+          <Pressable onPress={() => router.push("/register")}>
+            <Text className="underline text-primary-100">Register</Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>

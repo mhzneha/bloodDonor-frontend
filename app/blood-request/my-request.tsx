@@ -51,7 +51,7 @@ export default function MyRequestsPage() {
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 ">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -63,7 +63,7 @@ export default function MyRequestsPage() {
       >
         {/* Header */}
         <View className="flex-row items-center justify-between mb-5">
-          <Text className="text-[18px] font-bold text-gray-900">
+          <Text className="text-[18px] font-bold text-gray-900 dark:text-gray-300">
             My Requests
           </Text>
 

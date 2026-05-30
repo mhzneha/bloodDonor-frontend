@@ -273,16 +273,17 @@
 //   );
 // }
 
+import { FontAwesome6, Fontisto } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    RefreshControl,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -413,7 +414,7 @@ export default function DonorRequestsScreen() {
   // UI
   // =========================
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1 }}>
       <ScrollView
         contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
         refreshControl={
@@ -427,7 +428,10 @@ export default function DonorRequestsScreen() {
           />
         }
       >
-        <Text style={{ fontSize: 22, fontWeight: "800", marginBottom: 16 }}>
+        <Text
+          className="text-black-300 dark:text-gray-200"
+          style={{ fontSize: 22, fontWeight: "800", marginBottom: 16 }}
+        >
           Donation Requests
         </Text>
 
@@ -486,11 +490,13 @@ export default function DonorRequestsScreen() {
             </View>
 
             <Text style={{ color: "#6b7280", fontSize: 13 }}>
-              🏥 {req.blood_request.hospital_name}
+              <FontAwesome6 name="building" size={15} color="#a1a1aa" />{" "}
+              {req.blood_request.hospital_name}
             </Text>
 
             <Text style={{ color: "#6b7280", fontSize: 13 }}>
-              🩸 {req.blood_request.blood_group} ·{" "}
+              <Fontisto name="blood-drop" size={15} color="#ED3632" />{" "}
+              {req.blood_request.blood_group} ·{" "}
               {req.blood_request.units_required} units
             </Text>
 
@@ -501,7 +507,8 @@ export default function DonorRequestsScreen() {
                 marginBottom: 12,
               }}
             >
-              📩 {req.message}
+              <FontAwesome6 name="envelope" size={15} color="#a1a1aa" />{" "}
+              {req.message}
             </Text>
 
             {/* Actions */}

@@ -56,15 +56,60 @@ export default function Register() {
   const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<string[]>([]);
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const scheme = useColorScheme();
+
+  const isValidNepaliPhone = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, ""); // remove spaces, dashes
+
+    const pattern = /^(98|97|96)\d{8}$/;
+
+    return pattern.test(cleaned);
+  };
 
   const handleRegister = async (): Promise<void> => {
     setErrors([]);
+
+    const isStrongPassword = (password: string) => {
+      const minLength = /.{8,}/;
+      const upperCase = /[A-Z]/;
+      const number = /[0-9]/;
+      const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+      return (
+        minLength.test(password) &&
+        upperCase.test(password) &&
+        number.test(password) &&
+        specialChar.test(password)
+      );
+    };
 
     if (!fullName || !email || !password || !confirmPassword) {
       setErrors(["Please fill in all required fields"]);
       return;
     }
+
+    if (!email.includes("@")) {
+      setErrors(["Please enter a valid email"]);
+      return;
+    }
+
+    if (!isValidNepaliPhone(phone)) {
+      setErrors([
+        "Please enter a valid Nepali phone number (10 digits starting with 98, 97, or 96)",
+      ]);
+      return;
+    }
+
+    if (!isStrongPassword(password)) {
+      setErrors([
+        "Password must be at least 8 characters long and include 1 uppercase letter, 1 number, and 1 special character",
+      ]);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setErrors(["Passwords do not match"]);
       return;
@@ -75,7 +120,7 @@ export default function Register() {
         name: fullName,
         email: email,
         password: password,
-        phone_number: phone,
+        phone_number: phone.replace(/\D/g, ""),
       },
     };
 
@@ -197,7 +242,7 @@ export default function Register() {
               />
             </View>
 
-            <View className="mb-4">
+            {/* <View className="mb-4">
               <Text className="mb-2 text-gray-700 dark:text-white">
                 Password
               </Text>
@@ -209,9 +254,35 @@ export default function Register() {
                 value={password}
                 onChangeText={(text: string) => setPassword(text)}
               />
+            </View> */}
+
+            <View className="relative mb-4">
+              <Text className="mb-2 text-gray-700 dark:text-white">
+                Password
+              </Text>
+
+              <TextInput
+                className="p-4 pr-12 bg-gray-100 rounded-md dark:bg-gray-700 dark:text-white"
+                placeholder="Password"
+                placeholderTextColor="#9CA3AF"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={(text: string) => setPassword(text)}
+              />
+
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-11"
+              >
+                <FontAwesome6
+                  name={showPassword ? "eye-slash" : "eye"}
+                  size={18}
+                  color="#666"
+                />
+              </TouchableOpacity>
             </View>
 
-            <View className="mb-2">
+            {/* <View className="mb-2">
               <Text className="mb-2 text-gray-700 dark:text-white">
                 Confirm Password
               </Text>
@@ -223,6 +294,32 @@ export default function Register() {
                 value={confirmPassword}
                 onChangeText={(text: string) => setConfirmPassword(text)}
               />
+            </View> */}
+
+            <View className="relative mb-2">
+              <Text className="mb-2 text-gray-700 dark:text-white">
+                Confirm Password
+              </Text>
+
+              <TextInput
+                className="p-4 pr-12 bg-gray-100 rounded-md dark:bg-gray-700 dark:text-white"
+                placeholder="Confirm Password"
+                placeholderTextColor="#9CA3AF"
+                secureTextEntry={!showConfirmPassword}
+                value={confirmPassword}
+                onChangeText={(text: string) => setConfirmPassword(text)}
+              />
+
+              <TouchableOpacity
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-11"
+              >
+                <FontAwesome6
+                  name={showConfirmPassword ? "eye-slash" : "eye"}
+                  size={18}
+                  color="#666"
+                />
+              </TouchableOpacity>
             </View>
 
             <Pressable

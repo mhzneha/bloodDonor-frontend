@@ -64,7 +64,7 @@ const URGENCY_LEVELS: Array<{
 
 // Sub-components──────────────────────────────────────────────────────────
 const SectionLabel = ({ text }: { text: string }) => (
-  <Text className="mt-5 mb-2 text-xs font-semibold tracking-widest text-gray-900 uppercase">
+  <Text className="mt-5 mb-2 text-sm font-extrabold tracking-widest text-gray-900 uppercase dark:text-gray-200">
     {text}
   </Text>
 );
@@ -392,7 +392,7 @@ export default function CreateBloodRequest() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
-        <View className="px-6 py-8 bg-primary-100 shadow-lg rounded-b-3xl">
+        <View className="px-6 py-8 shadow-lg bg-primary-100 rounded-b-3xl">
           <View className="flex-row items-center gap-3">
             {/* <View className="items-center justify-center w-10 h-10 rounded-full bg-white/20">
               <Text className="text-lg font-bold text-white">🩸</Text>
