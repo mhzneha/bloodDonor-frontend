@@ -3,11 +3,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const API_URL =
@@ -30,7 +30,7 @@ export default function BloodRequestIndex() {
         },
       });
 
-      setData(res.data.blood_requests); // ✅ IMPORTANT
+      setData(res.data.blood_requests);
     } catch (err) {
       console.log("FETCH ERROR:", err);
     } finally {
@@ -56,7 +56,7 @@ export default function BloodRequestIndex() {
       contentContainerStyle={{
         paddingHorizontal: 20,
         paddingTop: 20,
-        paddingBottom: 40, // ✅ IMPORTANT for scrolling
+        paddingBottom: 40,
       }}
       showsVerticalScrollIndicator={false}
     >
@@ -81,6 +81,9 @@ export default function BloodRequestIndex() {
             location: item.hospital_name,
             time: new Date(item.created_at).toLocaleString(),
             bloodGroup: item.blood_group,
+            phone_number: item.contact_number,
+            unitsRequired: item.units_required,
+            unitsCollected: item.units_collected,
           }}
         />
       ))}

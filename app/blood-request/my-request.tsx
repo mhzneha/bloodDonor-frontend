@@ -85,13 +85,15 @@ export default function MyRequestsPage() {
         {data.map((item) => (
           <RequestCard
             key={item.id}
-            isMyRequest
             item={{
               id: String(item.id),
               name: item.patient_name,
               location: item.hospital_name,
               time: new Date(item.created_at).toLocaleString(),
               bloodGroup: item.blood_group,
+              phone_number: item.contact_number,
+              unitsRequired: item.units_required,
+              unitsCollected: item.units_collected,
             }}
           />
         ))}

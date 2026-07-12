@@ -314,6 +314,86 @@ export default function DonorRequestsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  const [donationDecisions, setDonationDecisions] = useState<
+    Record<number, "yes" | "no">
+  >({});
+  const [finalizedStatus, setFinalizedStatus] = useState<
+    Record<number, "completed" | "incomplete">
+  >({});
+
+  const finalizeDonation = async (
+    requestId: number,
+    status: "completed" | "incomplete",
+  ) => {
+    try {
+      const token = await AsyncStorage.getItem("auth_token");
+      if (!token) return;
+
+      await axios.patch(
+        `${BASE_URL}/blood_donation_requests/${requestId}/complete`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      await AsyncStorage.removeItem(`donation_decision_${requestId}`);
+      await AsyncStorage.setItem(`donation_status_${requestId}`, status);
+
+      setDonationDecisions((prev) => {
+        const next = { ...prev };
+        delete next[requestId];
+        return next;
+      });
+      setFinalizedStatus((prev) => ({ ...prev, [requestId]: status }));
+
+      Toast.show({
+        type: "success",
+        text1:
+          status === "completed"
+            ? "Donation marked complete"
+            : "Donation marked incomplete",
+      });
+    } catch (err: any) {
+      Toast.show({
+        type: "error",
+        text1: "Update failed",
+        text2: err?.response?.data?.message || "Something went wrong",
+      });
+    }
+  };
+
+  const loadDonationState = async (reqs: DonationRequest[]) => {
+    try {
+      const entries = await Promise.all(
+        reqs.map(async (r) => {
+          const [decision, status] = await Promise.all([
+            AsyncStorage.getItem(`donation_decision_${r.id}`),
+            AsyncStorage.getItem(`donation_status_${r.id}`),
+          ]);
+          return { id: r.id, decision, status };
+        }),
+      );
+
+      const decisionMap: Record<number, "yes" | "no"> = {};
+      const statusMap: Record<number, "completed" | "incomplete"> = {};
+
+      entries.forEach(({ id, decision, status }) => {
+        if (decision === "yes" || decision === "no") decisionMap[id] = decision;
+        if (status === "completed" || status === "incomplete")
+          statusMap[id] = status;
+      });
+
+      setDonationDecisions(decisionMap);
+      setFinalizedStatus(statusMap);
+    } catch (e) {
+      console.log("Failed to load donation state:", e);
+    }
+  };
+
   // =========================
   // FETCH REQUESTS
   // =========================
@@ -334,7 +414,9 @@ export default function DonorRequestsScreen() {
         },
       });
 
+      // setRequests(data.requests);
       setRequests(data.requests);
+      loadDonationState(data.requests);
     } catch (err: any) {
       console.log("Fetch error:", err?.response?.data || err.message);
       Toast.show({
@@ -562,6 +644,82 @@ export default function DonorRequestsScreen() {
                 >
                   {req.status === "accepted" ? "✓ Accepted" : "✕ Declined"}
                 </Text>
+              </View>
+            )}
+            {req.status === "accepted" && (
+              <View style={{ marginTop: 8 }}>
+                {finalizedStatus[req.id] ? (
+                  <View
+                    style={{
+                      paddingVertical: 8,
+                      borderRadius: 10,
+                      alignItems: "center",
+                      backgroundColor:
+                        finalizedStatus[req.id] === "completed"
+                          ? "#dcfce7"
+                          : "#fee2e2",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "700",
+                        color:
+                          finalizedStatus[req.id] === "completed"
+                            ? "#16a34a"
+                            : "#dc2626",
+                      }}
+                    >
+                      {finalizedStatus[req.id] === "completed"
+                        ? "✓ Donation Completed"
+                        : "✕ Donation Incomplete"}
+                    </Text>
+                  </View>
+                ) : donationDecisions[req.id] === "yes" ? (
+                  <TouchableOpacity
+                    onPress={() => finalizeDonation(req.id, "completed")}
+                    style={{
+                      backgroundColor: "#16a34a",
+                      borderRadius: 10,
+                      paddingVertical: 10,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text style={{ color: "#fff", fontWeight: "700" }}>
+                      Completed
+                    </Text>
+                  </TouchableOpacity>
+                ) : donationDecisions[req.id] === "no" ? (
+                  <View style={{ flexDirection: "row", gap: 8 }}>
+                    <TouchableOpacity
+                      onPress={() => finalizeDonation(req.id, "completed")}
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#16a34a",
+                        borderRadius: 10,
+                        paddingVertical: 10,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#fff", fontWeight: "700" }}>
+                        Complete
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => finalizeDonation(req.id, "incomplete")}
+                      style={{
+                        flex: 1,
+                        backgroundColor: "#dc2626",
+                        borderRadius: 10,
+                        paddingVertical: 10,
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#fff", fontWeight: "700" }}>
+                        Incomplete
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null}
               </View>
             )}
           </View>

@@ -10,6 +10,8 @@ export type BloodRequest = {
   time: string;
   bloodGroup: string;
   phone_number?: string;
+  unitsRequired: number;
+  unitsCollected: number;
 };
 
 type RequestCardProps = {
@@ -36,6 +38,7 @@ export default function RequestCard({
 
     Linking.openURL(`tel:${item.phone_number}`);
   };
+
   return (
     <View className="p-4 mb-5 bg-gray-100 shadow-sm rounded-2xl elevation-2">
       {/* Top row */}
@@ -59,6 +62,14 @@ export default function RequestCard({
         </View>
 
         <BloodGroupBadge group={item.bloodGroup} />
+      </View>
+
+      {/* Units row */}
+      <View className="flex-row items-center mb-3">
+        <FontAwesome6 name="droplet" size={12} color="#ED3632" solid />
+        <Text className="pl-2 text-xs font-medium text-gray-600">
+          {item.unitsCollected}/{item.unitsRequired} units collected
+        </Text>
       </View>
 
       {/* Buttons */}
@@ -90,11 +101,6 @@ export default function RequestCard({
             </Text>
           </TouchableOpacity>
         ) : (
-          // <TouchableOpacity className="flex-1 border border-red-400 rounded-xl py-2.5 items-center">
-          //   <Text className="text-sm font-semibold text-red-500">
-          //     Donate Blood
-          //   </Text>
-          // </TouchableOpacity>
           <TouchableOpacity
             onPress={callDonor}
             className="flex-1 flex-row items-center justify-center rounded-xl py-2.5 border border-primary-200"
@@ -105,10 +111,6 @@ export default function RequestCard({
             <Text className="text-sm font-bold text-primary-200">Call</Text>
           </TouchableOpacity>
         )}
-
-        {/* <TouchableOpacity className="items-center justify-center border border-gray-200 w-11 h-11 rounded-xl">
-          <FontAwesome6 name="phone-volume" size={18} color="#1F1F1F" />
-        </TouchableOpacity> */}
       </View>
     </View>
   );

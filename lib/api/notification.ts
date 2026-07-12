@@ -31,14 +31,14 @@ const authHeaders = async () => {
 export const fetchNotifications = async (): Promise<AppNotification[]> => {
   const headers = await authHeaders();
   const { data } = await axios.get(`${BASE_URL}/notifications`, { headers });
-  console.log("NOTIF RAW:", JSON.stringify(data, null, 2)); // temp
+  // console.log("NOTIF RAW:", JSON.stringify(data, null, 2)); // temp
   return data.notifications ?? data;
 };
 
 export const markNotificationAsRead = async (id: number) => {
   const headers = await authHeaders();
   const { data } = await axios.patch(
-    `${BASE_URL}/notifications/${id}/read`,
+    `${BASE_URL}/notifications/${id}/mark_as_read`,
     {},
     { headers },
   );

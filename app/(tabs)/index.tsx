@@ -2,6 +2,7 @@ import "../global.css";
 
 import type { LoggedInUser } from "@/app/types/user";
 import RequestCard from "@/components/request-card";
+import { fetchNotifications } from "@/lib/api/notification";
 import { FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -28,6 +29,8 @@ type BloodRequest = {
   location: string;
   time: string;
   bloodGroup: string;
+  unitsRequired: number;
+  unitsCollected: number;
 };
 
 const CATEGORIES = [
@@ -61,6 +64,7 @@ export default function BloodDonorScreen() {
   const [requests, setRequests] = useState<BloodRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<LoggedInUser | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   // const isDonor = !!user?.is_donor;
   const isDonor = user?.is_donor === true;
 
@@ -103,6 +107,8 @@ export default function BloodDonorScreen() {
         time: new Date(item.created_at).toLocaleString(),
         bloodGroup: item.blood_group,
         phone_number: item.contact_number,
+        unitsRequired: item.units_required,
+        unitsCollected: item.units_collected,
       }));
 
       setRequests(formatted);
@@ -148,6 +154,35 @@ export default function BloodDonorScreen() {
 
       loadUser();
       fetchRequests();
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        try {
+          const storedUser = await AsyncStorage.getItem("user");
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+          }
+        } catch (e) {
+          console.log("User load error:", e);
+        }
+      };
+
+      const loadUnreadCount = async () => {
+        try {
+          const notifications = await fetchNotifications();
+          const unread = notifications.filter((n) => n.read_at === null).length;
+          setUnreadCount(unread);
+        } catch (e) {
+          console.log("Notification load error:", e);
+        }
+      };
+
+      loadUser();
+      fetchRequests();
+      loadUnreadCount();
     }, []),
   );
 
@@ -213,7 +248,12 @@ export default function BloodDonorScreen() {
               className="p-1"
               onPress={() => router.push("/notifications")}
             >
-              <FontAwesome6 name="bell" size={24} color="#ffffff" solid />
+              <View className="relative">
+                <FontAwesome6 name="bell" size={24} color="#ffffff" solid />
+                {unreadCount > 0 && (
+                  <View className="absolute -top-0.5 -left-0.5 w-2.5 h-2.5 bg-green-500 rounded-full" />
+                )}
+              </View>
             </TouchableOpacity>
           </View>
         </View>

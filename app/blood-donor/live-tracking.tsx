@@ -31,6 +31,54 @@ export default function DonorLiveTrackingScreen() {
   const donation = data?.donation_request;
   const bloodRequest = data?.blood_request;
 
+  const patientName = bloodRequest?.patient_name ?? "the patient";
+
+  const saveDecision = async (decision: "yes" | "no") => {
+    try {
+      await AsyncStorage.setItem(`donation_decision_${requestId}`, decision);
+    } catch (e) {
+      console.log("Failed to save donation decision:", e);
+    }
+  };
+
+  const showCompletionPrompt = (onDone: () => void) => {
+    Alert.alert(
+      "Donation Completed?",
+      `Did you complete a donation of ${patientName}?`,
+      [
+        {
+          text: "No",
+          style: "cancel",
+          onPress: async () => {
+            await saveDecision("no");
+            onDone();
+          },
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            await saveDecision("yes");
+            onDone();
+          },
+        },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  const handleStopTracking = () => {
+    showCompletionPrompt(() => {
+      stopTracking();
+    });
+  };
+
+  const handleGoBack = () => {
+    showCompletionPrompt(() => {
+      stopTracking();
+      router.back();
+    });
+  };
+
   const donorLat = parseFloat(donation?.donor_latitude ?? "0");
   const donorLng = parseFloat(donation?.donor_longitude ?? "0");
 
@@ -252,7 +300,7 @@ export default function DonorLiveTrackingScreen() {
             : "Waiting for location..."}
         </Text>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={tracking ? stopTracking : startTracking}
           style={{
             backgroundColor: tracking ? "#dc2626" : "#16a34a",
@@ -274,6 +322,26 @@ export default function DonorLiveTrackingScreen() {
             router.back();
           }}
         >
+          <Text style={{ textAlign: "center", color: "#6b7280" }}>Go Back</Text>
+        </TouchableOpacity> */}
+
+        <TouchableOpacity
+          onPress={tracking ? handleStopTracking : startTracking}
+          style={{
+            backgroundColor: tracking ? "#dc2626" : "#16a34a",
+            padding: 12,
+            borderRadius: 10,
+            marginBottom: 8,
+          }}
+        >
+          <Text
+            style={{ color: "white", textAlign: "center", fontWeight: "700" }}
+          >
+            {tracking ? "Stop Tracking" : "Start Tracking"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleGoBack}>
           <Text style={{ textAlign: "center", color: "#6b7280" }}>Go Back</Text>
         </TouchableOpacity>
       </View>

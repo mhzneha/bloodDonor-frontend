@@ -84,6 +84,8 @@ export default function BloodRequestIndex() {
               time: new Date(item.created_at).toLocaleString(),
               bloodGroup: item.blood_group,
               phone_number: item.contact_number,
+              unitsRequired: item.units_required,
+              unitsCollected: item.units_collected,
             }}
           />
         ))}
