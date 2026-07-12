@@ -21,6 +21,23 @@ export default function Layout() {
           headerBackTitle: "Back",
         }}
       />
+
+      {/* <Stack.Screen
+        name="matching-donor"
+        options={{ title: "Matching Donor" }}
+      /> */}
+      <Stack.Screen
+        name="matching-donor"
+        options={{ title: "Matching Donor", headerBackTitle: "Back" }}
+      />
+
+      <Stack.Screen
+        name="blood-request/my-request"
+        options={{
+          title: "My Request",
+          headerBackTitle: "Back",
+        }}
+      />
     </Stack>
   );
 }

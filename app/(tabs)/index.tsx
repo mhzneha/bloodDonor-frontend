@@ -38,10 +38,10 @@ const CATEGORIES = [
   },
   {
     id: "2",
-    label: "Find Donor",
+    label: "My Request",
     icon: require("@/assets/icons/find-donor.png"),
   },
-  { id: "3", label: "Hospital", icon: "🏥" },
+  { id: "3", label: "Track Donor", icon: "🏥" },
   { id: "4", label: "Donror", icon: "👤" },
 ];
 
@@ -166,11 +166,11 @@ export default function BloodDonorScreen() {
     }
 
     if (id === "2") {
-      router.push("/blood-request/track-donor");
+      router.push("/blood-request/my-request");
     }
 
     if (id === "3") {
-      // router.push("/hospital");
+      router.push("/blood-donor/live-tracking");
     }
 
     if (id === "4") {
@@ -202,8 +202,17 @@ export default function BloodDonorScreen() {
             Blood Donor
           </Text>
 
-          <View className="flex-row items-center gap-3">
+          {/* <View className="flex-row items-center gap-3">
             <TouchableOpacity className="p-1">
+              <FontAwesome6 name="bell" size={24} color="#ffffff" solid />
+            </TouchableOpacity>
+          </View> */}
+
+          <View className="flex-row items-center gap-3">
+            <TouchableOpacity
+              className="p-1"
+              onPress={() => router.push("/notifications")}
+            >
               <FontAwesome6 name="bell" size={24} color="#ffffff" solid />
             </TouchableOpacity>
           </View>

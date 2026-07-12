@@ -27,6 +27,13 @@ export default function RootLayout() {
           name="modal"
           options={{ presentation: "modal", title: "Modal" }}
         />
+        <Stack.Screen
+          name="blood-request/my-request"
+          options={{
+            title: "My Request",
+            headerBackTitle: "Back",
+          }}
+        />
       </Stack>
       <StatusBar style="auto" />
       <Toast />

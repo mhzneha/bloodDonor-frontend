@@ -2,7 +2,7 @@ import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   Alert,
@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Types ───
 interface BloodRequest {
   id: number;
   blood_group: string;
@@ -31,28 +31,6 @@ interface BloodRequest {
   urgency: "normal" | "urgent" | "critical";
   user_id: number;
 }
-
-// interface Donor {
-//   id: number;
-//   user_id: number;
-//   blood_group: string;
-//   available: boolean;
-//   location: string | null;
-//   latitude: string | null;
-//   longitude: string | null;
-//   last_donated_at: string | null;
-//   verified: boolean | null;
-//   last_active_at: string | null;
-//   // user info may be nested depending on API
-//   name?: string;
-//   phone_number?: string;
-//   email?: string;
-//   user?: {
-//     name?: string;
-//     phone_number?: string;
-//     email?: string;
-//   };
-// }
 interface Donor {
   donor_id: number;
   donor_name: string;
@@ -104,7 +82,6 @@ const URGENCY_CONFIG = {
   },
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 const timeAgo = (iso: string | null): string => {
   if (!iso) return "—";
   const diff = Date.now() - new Date(iso).getTime();
@@ -132,7 +109,7 @@ const getDonorName = (donor: Donor): string => donor.donor_name;
 
 const getDonorPhone = (donor: Donor): string | null => donor.donor_phone_number;
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
+//Skeleton
 const Skeleton = ({
   w,
   h,
@@ -172,7 +149,7 @@ const DonorCardSkeleton = () => (
   </View>
 );
 
-// ── Donor Card ────────────────────────────────────────────────────────────────
+// Donor Card
 const DonorCard = ({
   donor,
   requestBloodGroup,
@@ -210,7 +187,7 @@ const DonorCard = ({
             borderColor: bloodColor,
           }}
         >
-          <Text style={{ fontSize: 20 }}>🩸</Text>
+          <Text style={{ fontSize: 20 }}>blood</Text>
         </View> */}
 
         {/* Info */}
@@ -277,7 +254,7 @@ const DonorCard = ({
 
           {/* {donor.location && (
             <Text className="text-xs text-gray-500" numberOfLines={1}>
-              📍 {donor.location}
+              {donor.location}
             </Text>
           )} */}
         </View>
@@ -333,7 +310,9 @@ const DonorCard = ({
         <View style={{ gap: 2 }}>
           <Text className="text-xs text-gray-700">Distance</Text>
           <Text className="text-xs font-semibold text-gray-500">
-            {donor.distance_km ? `${donor.distance_km.toFixed(1)} km` : "—"}
+            {donor.distance_km != null
+              ? `${Number(donor.distance_km).toFixed(1)} km`
+              : "—"}
           </Text>
         </View>
 
@@ -584,6 +563,7 @@ export default function MatchingDonorsScreen() {
 
   return (
     <View className="flex-1 ">
+      <Stack.Screen options={{ headerShown: false }} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 48 }}
@@ -596,7 +576,20 @@ export default function MatchingDonorsScreen() {
           />
         }
       >
-        {/* ── Header ──────────────────────────────────────────────────────── */}
+        {/* ── Header  */}
+        <View className="flex-row items-center px-5 pt-10 pb-3 mt-5 bg-white dark:bg-zinc-900 dark:border-zinc-800">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="z-10 items-center justify-center w-9 h-9"
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <FontAwesome6 name="arrow-left" size={18} color="#ffffff" />
+          </TouchableOpacity>
+          <Text className="ml-5 text-2xl font-bold text-black-300 dark:text-white">
+            Matching Donors
+          </Text>
+        </View>
         <View className="px-6 pt-10 pb-6 bg-red-200 rounded-b-3xl">
           {/* Back + title */}
           {/* <TouchableOpacity

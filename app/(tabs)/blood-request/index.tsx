@@ -31,7 +31,7 @@ export default function BloodRequestIndex() {
         },
       });
 
-      setData(res.data.blood_requests); // ✅ IMPORTANT
+      setData(res.data.blood_requests);
     } catch (err) {
       console.log("FETCH ERROR:", err);
     } finally {

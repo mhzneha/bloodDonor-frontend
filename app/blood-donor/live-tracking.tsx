@@ -1,4 +1,3 @@
-// app/donor/live-tracking.tsx
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as Location from "expo-location";
@@ -6,12 +5,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { getDistance } from "geolib";
 import React, { useEffect, useRef, useState } from "react";
 import {
-    Alert,
-    AppState,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  AppState,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import Toast from "react-native-toast-message";
@@ -38,20 +37,20 @@ export default function DonorLiveTrackingScreen() {
   const requesterLat = parseFloat(bloodRequest?.latitude ?? "0");
   const requesterLng = parseFloat(bloodRequest?.longitude ?? "0");
 
+  // Prefer live GPS coords over the stale value from the initial fetch
+  const effectiveDonorLat = lastCoords?.lat ?? donorLat;
+  const effectiveDonorLng = lastCoords?.lng ?? donorLng;
+
   const distanceMeters =
-    !isNaN(donorLat) &&
-    !isNaN(donorLng) &&
+    !isNaN(effectiveDonorLat) &&
+    !isNaN(effectiveDonorLng) &&
     !isNaN(requesterLat) &&
-    !isNaN(requesterLng)
+    !isNaN(requesterLng) &&
+    (effectiveDonorLat !== 0 || effectiveDonorLng !== 0) &&
+    (requesterLat !== 0 || requesterLng !== 0)
       ? getDistance(
-          {
-            latitude: donorLat,
-            longitude: donorLng,
-          },
-          {
-            latitude: requesterLat,
-            longitude: requesterLng,
-          },
+          { latitude: effectiveDonorLat, longitude: effectiveDonorLng },
+          { latitude: requesterLat, longitude: requesterLng },
         )
       : 0;
 
@@ -193,13 +192,13 @@ export default function DonorLiveTrackingScreen() {
       <MapView
         style={{ flex: 1 }}
         initialRegion={{
-          latitude: requesterLat || donorLat || 27.7172,
-          longitude: requesterLng || donorLng || 85.324,
+          latitude: requesterLat || donorLat,
+          longitude: requesterLng || donorLng,
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
       >
-        {/* 🔴 Donor */}
+        {/* Donor */}
         {lastCoords && (
           <Marker
             coordinate={{
@@ -240,7 +239,7 @@ export default function DonorLiveTrackingScreen() {
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: "700", marginBottom: 4 }}>
-          {tracking ? "Sharing Location 📡" : "Tracking Paused"}
+          {tracking ? "Sharing Location " : "Tracking Paused"}
         </Text>
 
         <Text style={{ marginBottom: 8, color: "#6b7280" }}>
