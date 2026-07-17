@@ -1,38 +1,76 @@
+import { HapticTab } from "@/components/haptic-tab";
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/AuthContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Redirect, Slot } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Redirect, Tabs } from "expo-router";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const isAuthenticated = false;
-  if (!isAuthenticated) return <Redirect href="/login" />;
-  return <Slot />;
+  // const isAuthenticated = true;
 
-  // return (
-  //   <Tabs
-  //     screenOptions={{
-  //       tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-  //       headerShown: false,
-  //       tabBarButton: HapticTab,
-  //     }}
-  //   >
-  //     <Tabs.Screen
-  //       name="index"
-  //       options={{
-  //         title: "Home",
-  //         tabBarIcon: ({ color }) => (
-  //           <IconSymbol size={28} name="house.fill" color={color} />
-  //         ),
-  //       }}
-  //     />
-  //     <Tabs.Screen
-  //       name="explore"
-  //       options={{
-  //         title: "Explore",
-  //         tabBarIcon: ({ color }) => (
-  //           <IconSymbol size={28} name="paperplane.fill" color={color} />
-  //         ),
-  //       }}
-  //     />
-  //   </Tabs>
-  // );
+  // if (!isAuthenticated) return <Redirect href="/login" />;
+
+  const { user } = useAuth();
+
+  if (!user) return <Redirect href="/login" />;
+
+  const tintColor = Colors[colorScheme ?? "light"].tint;
+
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#ED3632",
+        tabBarButton: HapticTab,
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={24} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="blood-request"
+        options={{
+          title: "Requests",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="water" size={24} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="all-donor"
+        options={{
+          title: "Donors",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="people" size={24} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={24} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="blood-donor"
+        options={{
+          href: null,
+        }}
+      />
+    </Tabs>
+  );
 }

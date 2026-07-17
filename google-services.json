@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "402204010207",
+    "project_id": "blooddonorfinder-ea620",
+    "storage_bucket": "blooddonorfinder-ea620.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:402204010207:android:f42e076655c8ebf744eb6a",
+        "android_client_info": {
+          "package_name": "com.neha_mhz.bloodDonorfrontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQAxCufOHWG6Yg17984xwC78dUdEoEMxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
