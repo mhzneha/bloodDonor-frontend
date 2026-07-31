@@ -470,7 +470,7 @@ export default function BecomeDonor() {
         },
       };
 
-      console.log("SENDING:", payload);
+      // console.log("SENDING:", payload);
 
       // const response = await axios.post(API_URL, payload, {
       //   headers: {
@@ -499,7 +499,7 @@ export default function BecomeDonor() {
         },
       });
 
-      console.log("SUCCESS:", response.data);
+      // console.log("SUCCESS:", response.data);
 
       const storedUser = await AsyncStorage.getItem("user");
 

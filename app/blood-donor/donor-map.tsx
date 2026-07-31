@@ -47,7 +47,12 @@ export default function FindDonorsScreen() {
         const validDonors = data.filter((d) => {
           const lat = parseFloat(d.latitude);
           const lng = parseFloat(d.longitude);
-          return !isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0);
+          return (
+            d.available &&
+            !isNaN(lat) &&
+            !isNaN(lng) &&
+            (lat !== 0 || lng !== 0)
+          );
         });
 
         setDonors(validDonors);
@@ -86,6 +91,7 @@ export default function FindDonorsScreen() {
     );
   }
 
+
   return (
     <View className="flex-1">
       <CustomHeader title="Find Donors" />
@@ -110,11 +116,13 @@ export default function FindDonorsScreen() {
             }}
             title={donor.user.name}
             description={`Blood Group: ${donor.blood_group}`}
-            pinColor={donor.available ? "green" : "gray"}
+            pinColor="green"
             onCalloutPress={() => setSelectedDonor(donor)}
             onPress={() => setSelectedDonor(donor)}
           />
         ))}
+        
+
       </MapView>
 
       {/* DONOR DETAILS PANEL */}
@@ -127,19 +135,19 @@ export default function FindDonorsScreen() {
             {selectedDonor.user.name}
           </Text>
 
-          <Text className="mb-0.5 text-zinc-500">
+          <Text className="mb-1 text-zinc-500">
             <Fontisto name="blood-drop" size={18} color="#ED3632" /> Blood
             Group: {selectedDonor.blood_group}
           </Text>
 
-          <Text className="mb-0.5 text-zinc-500">
+          <Text className="mb-4 text-zinc-500">
             <FontAwesome6 name="phone-volume" size={15} color="#a1a1aa" />{" "}
             Phone: {selectedDonor.user.phone_number}
           </Text>
 
-          <Text className="mb-2.5 text-zinc-500">
+          {/* <Text className="mb-2 text-zinc-500">
             Status: {selectedDonor.available ? "Available" : "Unavailable"}
-          </Text>
+          </Text> */}
 
           <TouchableOpacity
             onPress={() => setSelectedDonor(null)}
@@ -151,6 +159,7 @@ export default function FindDonorsScreen() {
           </TouchableOpacity>
         </View>
       )}
+
     </View>
   );
 }

@@ -21,29 +21,22 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+
+        {/* <Stack.Screen
           name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
-        />
+          options={{
+            presentation: "modal",
+            title: "Modal",
+          }}
+        /> */}
+
         <Stack.Screen
-          name="my-request"
+          name="/blood-request/my-request"
           options={{
             title: "My Request",
             headerBackTitle: "Back",
-          }}
-        />
-        <Stack.Screen
-          name="blood-request"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="blood-donor"
-          options={{
-            headerShown: false,
           }}
         />
       </Stack>

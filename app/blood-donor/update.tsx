@@ -523,7 +523,7 @@ export default function UpdateDonorProfile() {
       };
 
       // console.log("PATCHING:", payload);
-      console.log("LAST DONATED RAW:", lastDonatedAt);
+      // console.log("LAST DONATED RAW:", lastDonatedAt);
 
       const res = await axios.put(API_URL, payload, {
         headers: {
@@ -535,7 +535,7 @@ export default function UpdateDonorProfile() {
 
       const updated = res.data.donor_profile;
 
-      console.log("UPDATED:", updated);
+      // console.log("UPDATED:", updated);
 
       // Navigate back to profile show page so changes are visible
       router.replace({

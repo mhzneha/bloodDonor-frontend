@@ -314,7 +314,7 @@ export default function CreateBloodRequest() {
       setLoading(true);
 
       const token = await AsyncStorage.getItem("auth_token");
-      console.log("TOKEN:", token);
+      // console.log("TOKEN:", token);
 
       if (!token) {
         Alert.alert("Error", "Please login again");
@@ -334,7 +334,7 @@ export default function CreateBloodRequest() {
         },
       };
 
-      console.log("SENDING:", payload);
+      // console.log("SENDING:", payload);
 
       const response = await axios.post(API_URL, payload, {
         headers: {
@@ -344,7 +344,7 @@ export default function CreateBloodRequest() {
         },
       });
 
-      console.log("SUCCESS RESPONSE:", response.data);
+      // console.log("SUCCESS RESPONSE:", response.data);
 
       // Reset form
       setPatientName("");

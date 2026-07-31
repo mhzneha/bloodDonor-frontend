@@ -1,4 +1,5 @@
 import Logo from "@/components/Logo";
+import { LoggedInUser } from "@/types/user";
 import { FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError } from "axios";
@@ -12,7 +13,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LoggedInUser } from "../types/user";
 
 interface LoginRequestBody {
   user: {

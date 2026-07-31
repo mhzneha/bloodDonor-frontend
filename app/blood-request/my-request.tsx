@@ -37,6 +37,12 @@ export default function MyRequestsPage() {
     fetchMyRequests();
   }, []);
 
+  const sortedData = [...data].sort((a, b) => {
+    const aCompleted = a.units_collected >= a.units_required ? 1 : 0;
+    const bCompleted = b.units_collected >= b.units_required ? 1 : 0;
+    return aCompleted - bCompleted; // incomplete first, completed last
+  });
+
   if (loading) {
     return (
       <View className="items-center justify-center flex-1">
@@ -65,7 +71,7 @@ export default function MyRequestsPage() {
           )}
 
           {/* Request Cards */}
-          {data.map((item) => (
+          {sortedData.map((item) => (
             <RequestCard
               key={item.id}
               isMyRequest

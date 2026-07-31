@@ -394,6 +394,8 @@ export default function DonorListScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selected, setSelected] = useState<Donor | null>(null);
+  const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
 
   const fetchDonors = async () => {
     try {

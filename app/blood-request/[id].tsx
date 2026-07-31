@@ -32,21 +32,22 @@ export default function RequestDetail() {
       const token = await AsyncStorage.getItem("auth_token");
 
       const res = await axios.get(
-        "https://blood-donor-finder-be.onrender.com/api/v1/blood_requests",
+        `https://blood-donor-finder-be.onrender.com/api/v1/blood_requests/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       );
+      setRequest(res.data.blood_request ?? res.data);
 
-      const data = res.data.blood_requests;
+      // const data = res.data.blood_requests;
 
-      const found = data.find(
-        (item: BloodRequest) => String(item.id) === String(id),
-      );
+      // const found = data.find(
+      //   (item: BloodRequest) => String(item.id) === String(id),
+      // );
 
-      setRequest(found || null);
+      // setRequest(found || null);
     } catch (err) {
       console.log("ERROR:", err);
     } finally {

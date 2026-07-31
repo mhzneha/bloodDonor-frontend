@@ -1,6 +1,7 @@
+import DonorSearchFilter from "@/components/donor-search-filter";
 import "../global.css";
 
-import type { LoggedInUser } from "@/app/types/user";
+import type { LoggedInUser } from "@/types/user";
 import RequestCard from "@/components/request-card";
 import { fetchNotifications } from "@/lib/api/notification";
 import { FontAwesome6 } from "@expo/vector-icons";
@@ -71,6 +72,7 @@ export default function BloodDonorScreen() {
   const [unreadCount, setUnreadCount] = useState(0);
   // const isDonor = !!user?.is_donor;
   const isDonor = user?.is_donor === true;
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const fetchRequests = async () => {
     try {
@@ -229,7 +231,8 @@ export default function BloodDonorScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#dc2626" />
 
       {/* ── Header ── */}
-      <View className="px-5 py-5 pb-6 bg-primary-200 rounded-br-3xl rounded-bl-3xl">
+      <View className="px-5 py-5 pb-6 bg-primary-200 rounded-br-3xl rounded-bl-3xl" style={{ zIndex: 20, elevation: 20 }}>
+      
         {/* Top row */}
         <View className="flex-row items-center justify-between pt-1 mb-4">
           <TouchableOpacity onPress={() => router.push("/profile")}>
@@ -261,31 +264,14 @@ export default function BloodDonorScreen() {
           </View>
         </View>
         {/* Search bar */}
-        <View className="flex-row items-center gap-3 my-2">
-          <View className="flex-row items-center flex-1 px-3 py-2 bg-white shadow rounded-2xl shadow-black/10 elevation-3">
-            <FontAwesome6 name="magnifying-glass" size={20} />
-            <TextInput
-              placeholder="Search For Donors"
-              placeholderTextColor="#9CA3AF"
-              value={search}
-              onChangeText={setSearch}
-              className="flex-1 ml-2 text-sm text-gray-900"
-            />
-          </View>
-          <TouchableOpacity className="">
-            <Image
-              source={require("../../assets/icons/filter.png")}
-              className="w-7 h-7"
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        </View>
+        <DonorSearchFilter onDropdownVisibilityChange={setDropdownOpen} />
       </View>
 
       <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 32 }}
-      >
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={!dropdownOpen}
+          contentContainerStyle={{ paddingBottom: 32 }}
+        >
         {/* Become donor card */}
         <View className="">
           <ImageBackground
