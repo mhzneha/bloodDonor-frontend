@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
+import * as DocumentPicker from "expo-document-picker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -311,6 +312,7 @@ export default function BecomeDonor() {
   const [location, setLocation] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [documents, setDocuments] = useState<DocumentPicker.DocumentPickerAsset[]>([]);
   const [lastDonatedAt, setLastDonatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [locLoading, setLocLoading] = useState(false);
@@ -371,6 +373,28 @@ export default function BecomeDonor() {
       setLocLoading(false);
     }
   };
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+        multiple: true, // 👈 allow multiple files
+      });
+
+      if (!result.canceled && result.assets?.length > 0) {
+        setDocuments((prev) => [...prev, ...result.assets]);
+        clearFieldError("document");
+      }
+    } catch (e) {
+      console.log("Document pick error:", e);
+      Alert.alert("Error", "Could not select the file.");
+    }
+  };
+
+const removeDocument = (uri: string) => {
+  setDocuments((prev) => prev.filter((d) => d.uri !== uri));
+};
 
   useEffect(() => {
     (async () => {
@@ -459,16 +483,30 @@ export default function BecomeDonor() {
         return;
       }
 
-      const payload = {
-        donor_profile: {
-          blood_group: bloodGroup,
-          available,
-          location: location.trim(),
-          latitude,
-          longitude,
-          last_donated_at: lastDonatedAt,
-        },
-      };
+      const formData = new FormData();
+        formData.append("donor_profile[blood_group]", bloodGroup);
+        formData.append("donor_profile[available]", String(available));
+        formData.append("donor_profile[location]", location.trim());
+        formData.append("donor_profile[latitude]", latitude);
+        formData.append("donor_profile[longitude]", longitude);
+        if (lastDonatedAt) {
+          formData.append("donor_profile[last_donated_at]", lastDonatedAt);
+        }
+        documents.forEach((doc) => {
+          formData.append("donor_profile[verification_documents][]", {
+            uri: doc.uri,
+            name: doc.name,
+            type: doc.mimeType || "application/octet-stream",
+          } as any);
+        });
+
+        const response = await axios.post(API_URL, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+            Accept: "application/json",
+          },
+        });
 
       // console.log("SENDING:", payload);
 
@@ -491,13 +529,13 @@ export default function BecomeDonor() {
       //   );
       // }, 300);
 
-      const response = await axios.post(API_URL, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
+      // const response = await axios.post(API_URL, payload, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //     "Content-Type": "application/json",
+      //     Accept: "application/json",
+      //   },
+      // });
 
       // console.log("SUCCESS:", response.data);
 
@@ -508,7 +546,7 @@ export default function BecomeDonor() {
 
         const updatedUser = {
           ...parsedUser,
-          is_donor: true, // 👈 KEY FIX
+          is_donor: true, 
         };
 
         await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
@@ -619,7 +657,56 @@ export default function BecomeDonor() {
             Helps us check eligibility (donors should wait 3 months between
             donations).
           </Text>
+          {/* Verification Document */}
+          <SectionLabel text="Verification Document" />
+          <Text className="mb-2 -mt-1 text-xs text-gray-600">
+            Upload your blood group card, previous donation certificate, or any valid proof.
+          </Text>
 
+          <TouchableOpacity
+            onPress={pickDocument}
+            className={`flex-row items-center justify-center gap-2 py-3 mb-1 border rounded-xl ${
+              fieldErrors.document ? "border-red-500" : "border-gray-700"
+            }`}
+            activeOpacity={0.8}
+          >
+            <FontAwesome6 name="file-arrow-up" size={20} color="#EF5350" solid />
+            <Text className="text-sm font-semibold text-black-200">
+              {documents.length > 0 ? "Add More Documents" : "Upload Document"}
+            </Text>
+          </TouchableOpacity>
+
+          {documents.length > 0 && (
+            <View className="mt-2" style={{ gap: 8 }}>
+              {documents.map((doc) => (
+                <View
+                  key={doc.uri}
+                  className="flex-row items-center justify-between px-4 py-3 border border-gray-700 rounded-xl"
+                >
+                  <View style={{ flex: 1, marginRight: 8 }}>
+                    <Text className="text-sm text-black-200" numberOfLines={1}>
+                      {doc.name}
+                    </Text>
+                    {typeof doc.size === "number" && (
+                      <Text className="text-xs text-gray-500">
+                        {(doc.size / 1024).toFixed(1)} KB
+                      </Text>
+                    )}
+                  </View>
+                  <TouchableOpacity onPress={() => removeDocument(doc.uri)}>
+                    <FontAwesome6 name="xmark" size={18} color="#9CA3AF" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {fieldErrors.document ? (
+            <Text className="mt-1 text-xs text-red-400">{fieldErrors.document}</Text>
+          ) : null}    
+          <Text className="text-sm font-semibold text-black-200">
+            {documents.length > 0 ? "Add More Documents" : "Upload Document"}
+          </Text>
           {/* Location */}
           {/* <SectionLabel text="Location" /> */}
 

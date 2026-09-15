@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
+import * as DocumentPicker from "expo-document-picker";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -19,6 +20,13 @@ import {
 } from "react-native";
 
 //  Types
+interface VerificationDocument {
+  id: number;
+  filename: string;
+  content_type: string;
+  url: string;
+}
+
 interface DonorProfile {
   id: number;
   available: boolean | null;
@@ -32,6 +40,7 @@ interface DonorProfile {
   user_id: number;
   verified: boolean | null;
   last_active_at: string | null;
+  verification_documents?: VerificationDocument[];
 }
 
 // Constants
@@ -349,6 +358,9 @@ export default function UpdateDonorProfile() {
   const [longitude, setLongitude] = useState("");
   const [lastDonatedAt, setLastDonatedAt] = useState<string | null>(null);
 
+  const [documents, setDocuments] = useState<DocumentPicker.DocumentPickerAsset[]>([]);
+  const [existingDocuments, setExistingDocuments] = useState<VerificationDocument[]>([]);
+
   // UI state
   const [fetchLoading, setFetchLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
@@ -388,6 +400,7 @@ export default function UpdateDonorProfile() {
       setLastDonatedAt(
         data.last_donated_at ? data.last_donated_at.split("T")[0] : null,
       );
+      setExistingDocuments(data.verification_documents ?? []);
       setOriginal(data);
     } catch (err: any) {
       const status = err?.response?.status;
@@ -458,6 +471,28 @@ export default function UpdateDonorProfile() {
     }
   };
 
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+        multiple: true,
+      });
+
+      if (!result.canceled && result.assets?.length > 0) {
+        setDocuments((prev) => [...prev, ...result.assets]);
+        clearFieldError("document");
+      }
+    } catch (e) {
+      console.log("Document pick error:", e);
+      Alert.alert("Error", "Could not select the file.");
+    }
+  };
+
+  const removeDocument = (uri: string) => {
+    setDocuments((prev) => prev.filter((d) => d.uri !== uri));
+  };
+
   //  Validation
   const clearFieldError = (field: string) =>
     setFieldErrors((prev) => {
@@ -481,6 +516,16 @@ export default function UpdateDonorProfile() {
   };
 
   //  Detect changed fields
+  // const hasChanges = (): boolean => {
+  //   return (
+  //     bloodGroup !== (original.blood_group ?? "") ||
+  //     available !== (original.available ?? true) ||
+  //     location !== (original.location ?? "") ||
+  //     latitude !== (original.latitude ?? "") ||
+  //     longitude !== (original.longitude ?? "") ||
+  //     lastDonatedAt !== (original.last_donated_at ?? null)
+  //   );
+  // };
   const hasChanges = (): boolean => {
     return (
       bloodGroup !== (original.blood_group ?? "") ||
@@ -488,7 +533,8 @@ export default function UpdateDonorProfile() {
       location !== (original.location ?? "") ||
       latitude !== (original.latitude ?? "") ||
       longitude !== (original.longitude ?? "") ||
-      lastDonatedAt !== (original.last_donated_at ?? null)
+      lastDonatedAt !== (original.last_donated_at ?? null) ||
+      documents.length > 0
     );
   };
 
@@ -510,34 +556,34 @@ export default function UpdateDonorProfile() {
         return;
       }
 
-      const payload = {
-        donor_profile: {
-          blood_group: bloodGroup,
-          available,
-          location: location.trim(),
-          latitude,
-          longitude,
-          // last_donated_at: lastDonatedAt ? lastDonatedAt : null,
-          last_donated_at: lastDonatedAt ? lastDonatedAt + "T00:00:00Z" : null,
-        },
-      };
+      const formData = new FormData();
+      formData.append("donor_profile[blood_group]", bloodGroup);
+      formData.append("donor_profile[available]", String(available));
+      formData.append("donor_profile[location]", location.trim());
+      formData.append("donor_profile[latitude]", latitude);
+      formData.append("donor_profile[longitude]", longitude);
+      formData.append(
+        "donor_profile[last_donated_at]",
+        lastDonatedAt ? lastDonatedAt + "T00:00:00Z" : "",
+      );
+      documents.forEach((doc) => {
+        formData.append("donor_profile[verification_documents][]", {
+          uri: doc.uri,
+          name: doc.name,
+          type: doc.mimeType || "application/octet-stream",
+        } as any);
+      });
 
-      // console.log("PATCHING:", payload);
-      // console.log("LAST DONATED RAW:", lastDonatedAt);
-
-      const res = await axios.put(API_URL, payload, {
+      const res = await axios.put(API_URL, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
           Accept: "application/json",
         },
       });
 
       const updated = res.data.donor_profile;
 
-      // console.log("UPDATED:", updated);
-
-      // Navigate back to profile show page so changes are visible
       router.replace({
         pathname: "/blood-donor/detail",
         params: { refresh: Date.now().toString() },
@@ -707,6 +753,70 @@ export default function UpdateDonorProfile() {
               Helps us check eligibility (donors wait 3 months between
               donations).
             </Text>
+
+            {/* Verification Document */}
+            <SectionLabel text="Verification Document" />
+            <Text className="mb-2 -mt-1 text-xs text-gray-600">
+              Upload your blood group card, previous donation certificate, or any valid proof.
+            </Text>
+
+            <TouchableOpacity
+              onPress={pickDocument}
+              className={`flex-row items-center justify-center gap-2 py-3 mb-1 border rounded-xl ${
+                fieldErrors.document ? "border-red-500" : "border-gray-700"
+              }`}
+              activeOpacity={0.8}
+            >
+              <FontAwesome6 name="file-arrow-up" size={20} color="#EF5350" solid />
+              <Text className="text-sm font-semibold text-gray-500">
+                {documents.length > 0 ? "Add More Documents" : existingDocuments.length > 0 ? "Replace Document" : "Upload Document"}
+              </Text>
+            </TouchableOpacity>
+
+            {documents.length > 0 && (
+              <View className="mt-2" style={{ gap: 8 }}>
+                {documents.map((doc) => (
+                  <View
+                    key={doc.uri}
+                    className="flex-row items-center justify-between px-4 py-3 border border-gray-700 rounded-xl"
+                  >
+                    <View style={{ flex: 1, marginRight: 8 }}>
+                      <Text className="text-sm text-gray-500" numberOfLines={1}>
+                        {doc.name}
+                      </Text>
+                      {typeof doc.size === "number" && (
+                        <Text className="text-xs text-gray-500">
+                          {(doc.size / 1024).toFixed(1)} KB
+                        </Text>
+                      )}
+                    </View>
+                    <TouchableOpacity onPress={() => removeDocument(doc.uri)}>
+                      <FontAwesome6 name="xmark" size={18} color="#9CA3AF" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {documents.length === 0 && existingDocuments.length > 0 && (
+              <View className="mt-2" style={{ gap: 8 }}>
+                {existingDocuments.map((doc) => (
+                  <View
+                    key={doc.id}
+                    className="flex-row items-center justify-between px-4 py-3 border border-gray-700 rounded-xl"
+                  >
+                    <Text className="text-sm text-gray-500" numberOfLines={1} style={{ flex: 1, marginRight: 8 }}>
+                      {doc.filename}
+                    </Text>
+                    <FontAwesome6 name="circle-check" size={16} color="#16a34a" solid />
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {fieldErrors.document ? (
+              <Text className="mt-1 text-xs text-red-400">{fieldErrors.document}</Text>
+            ) : null}
 
             {/* Location */}
             {/* <SectionLabel text="Location" />

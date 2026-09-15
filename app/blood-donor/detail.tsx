@@ -7,6 +7,8 @@ import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   Alert,
+  Linking,
+  Image,
   RefreshControl,
   ScrollView,
   Text,
@@ -15,6 +17,13 @@ import {
 } from "react-native";
 
 //  Types
+interface VerificationDocument {
+  id: number;
+  filename: string;
+  content_type: string;
+  url: string;
+}
+
 interface DonorProfile {
   id: number;
   available: boolean | null;
@@ -28,6 +37,7 @@ interface DonorProfile {
   user_id: number;
   verified: boolean | null;
   last_active_at: string | null;
+  verification_documents?: VerificationDocument[]; // 👈 add this
 }
 
 //  Constants
@@ -531,6 +541,77 @@ export default function DonorProfileScreen() {
                 last
               />
             </View>
+          </View>
+
+          {/* Verification Documents */}
+          <View>
+            <Text className="mb-2 text-sm font-extrabold tracking-widest text-gray-900 uppercase dark:text-gray-400">
+              Verification Documents
+            </Text>
+
+            {profile.verification_documents && profile.verification_documents.length > 0 ? (
+              <View style={{ gap: 8 }}>
+                {profile.verification_documents.map((doc) => {
+                  const isImage = doc.content_type?.startsWith("image/");
+
+                  return (
+                    <TouchableOpacity
+                      key={doc.id}
+                      onPress={() =>
+                        Linking.openURL(doc.url).catch(() =>
+                          Alert.alert("Error", "Could not open document."),
+                        )
+                      }
+                      activeOpacity={0.8}
+                      className="flex-row items-center px-4 py-3 border border-gray-800 rounded-2xl"
+                      style={{ gap: 12 }}
+                    >
+                      {isImage ? (
+                        <Image
+                          source={{ uri: doc.url }}
+                          style={{ width: 40, height: 40, borderRadius: 8 }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View
+                          className="items-center justify-center rounded-lg"
+                          style={{ width: 40, height: 40, backgroundColor: "#1c1917" }}
+                        >
+                          <FontAwesome6 name="file-lines" size={18} color="#9ca3af" />
+                        </View>
+                      )}
+
+                      <View style={{ flex: 1 }}>
+                        <Text
+                          className="text-sm font-semibold text-gray-900 dark:text-gray-200"
+                          numberOfLines={1}
+                        >
+                          {doc.filename}
+                        </Text>
+                        <Text className="text-xs text-gray-500">Tap to view</Text>
+                      </View>
+
+                      <FontAwesome6 name="chevron-right" size={14} color="#9ca3af" />
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : (
+              <View className="items-center px-4 py-6 border border-gray-800 border-dashed rounded-2xl">
+                <FontAwesome6 name="file-circle-xmark" size={20} color="#6b7280" />
+                <Text className="mt-2 text-xs text-center text-gray-500">
+                  No verification documents uploaded yet.
+                </Text>
+                <TouchableOpacity
+                  onPress={() => router.push("/blood-donor/update?edit=true")}
+                  className="mt-2"
+                >
+                  <Text className="text-xs font-semibold text-primary-100">
+                    Upload one now
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
           {/* Location */}

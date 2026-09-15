@@ -50,7 +50,7 @@ const CATEGORIES = [
     label: "Find Donors",
     icon: require("@/assets/icons/donors-location.png"),
   },
-  { id: "4", label: "Donror", icon: "" },
+  { id: "4", label: "Profile", icon: "" },
 ];
 
 const AvatarPlaceholder = ({ className = "" }: { className?: string }) => (
@@ -294,7 +294,7 @@ export default function BloodDonorScreen() {
             >
               <View className="p-3">
                 <Text className="text-2xl font-semibold text-white">
-                  Become a Blood Donor
+                  Blood Donation
                 </Text>
                 <Text className="text-white">
                   Join our donor community and help save lives during
