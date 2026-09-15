@@ -47,24 +47,75 @@ export default function DonorRequestsScreen() {
     Record<number, "completed" | "incomplete">
   >({});
 
+  // const finalizeDonation = async (
+  //   requestId: number,
+  //   status: "completed" | "incomplete",
+  // ) => {
+  //   try {
+  //     const token = await AsyncStorage.getItem("auth_token");
+  //     if (!token) return;
+
+  //     await axios.patch(
+  //       `${BASE_URL}/blood_donation_requests/${requestId}/complete`,
+  //       { status },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           "Content-Type": "application/json",
+  //         },
+  //       },
+  //     );
+
+  //     await AsyncStorage.removeItem(`donation_decision_${requestId}`);
+  //     await AsyncStorage.setItem(`donation_status_${requestId}`, status);
+
+  //     setDonationDecisions((prev) => {
+  //       const next = { ...prev };
+  //       delete next[requestId];
+  //       return next;
+  //     });
+  //     setFinalizedStatus((prev) => ({ ...prev, [requestId]: status }));
+
+  //     Toast.show({
+  //       type: "success",
+  //       text1:
+  //         status === "completed"
+  //           ? "Donation was completed"
+  //           : "Donation was incomplete",
+  //     });
+  //   } catch (err: any) {
+  //     Toast.show({
+  //       type: "error",
+  //       text1: "Update failed",
+  //       text2: err?.response?.data?.message || "Something went wrong",
+  //     });
+  //   }
+  // };
+
   const finalizeDonation = async (
     requestId: number,
     status: "completed" | "incomplete",
   ) => {
     try {
-      const token = await AsyncStorage.getItem("auth_token");
-      if (!token) return;
+      // Backend has no handling for "incomplete" yet — only hit the API
+      // for actual completions. For incomplete, just record it locally so
+      // nothing on the server (units_collected, donor availability, etc.)
+      // gets touched until backend support exists.
+      if (status === "completed") {
+        const token = await AsyncStorage.getItem("auth_token");
+        if (!token) return;
 
-      await axios.patch(
-        `${BASE_URL}/blood_donation_requests/${requestId}/complete`,
-        { status },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+        await axios.patch(
+          `${BASE_URL}/blood_donation_requests/${requestId}/complete`,
+          { status },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           },
-        },
-      );
+        );
+      }
 
       await AsyncStorage.removeItem(`donation_decision_${requestId}`);
       await AsyncStorage.setItem(`donation_status_${requestId}`, status);
