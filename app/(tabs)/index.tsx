@@ -50,7 +50,7 @@ const CATEGORIES = [
     label: "Find Donors",
     icon: require("@/assets/icons/donors-location.png"),
   },
-  { id: "4", label: "Profile", icon: "" },
+  { id: "4", label: "Donor Profile", icon: require("@/assets/icons/blood-donor.png"), },
 ];
 
 const AvatarPlaceholder = ({ className = "" }: { className?: string }) => (
@@ -214,7 +214,7 @@ export default function BloodDonorScreen() {
     }
 
     if (id === "4") {
-      router.push("/profile");
+      router.push("/blood-donor/detail");
     }
   };
 

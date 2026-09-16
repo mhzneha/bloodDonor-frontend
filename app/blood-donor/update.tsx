@@ -238,7 +238,7 @@ const DatePickerField = ({
   return (
     <View className="mb-3">
       <Text className="mb-1 text-sm font-medium text-gray-600 dark:text-gray-400">
-        {label}
+        {label} 
       </Text>
       <TouchableOpacity
         onPress={() => setOpen(true)}
@@ -503,15 +503,18 @@ export default function UpdateDonorProfile() {
 
   const validateAll = (): boolean => {
     const errors: Record<string, string> = {};
+
     if (!bloodGroup) errors.bloodGroup = "Please select your blood group.";
-    // if (!location.trim()) errors.location = "Location name is required.";
-    // if (!latitude.trim()) errors.latitude = "Latitude is required.";
-    // else if (isNaN(Number(latitude)))
-    //   errors.latitude = "Must be a valid number.";
-    // if (!longitude.trim()) errors.longitude = "Longitude is required.";
-    // else if (isNaN(Number(longitude)))
-    //   errors.longitude = "Must be a valid number.";
-    // setFieldErrors(errors);
+
+    if (!lastDonatedAt) {
+      errors.lastDonatedAt = "Please select your last donation date.";
+    }
+
+    if (documents.length === 0 && existingDocuments.length === 0) {
+      errors.document = "Please upload at least one verification document.";
+    }
+
+    setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
@@ -648,7 +651,7 @@ export default function UpdateDonorProfile() {
       >
         {/*  Header */}
         <View
-          className="px-6 py-8 shadow-lg rounded-b-3xl bg-primary-200/70"
+          className="px-6 py-7 shadow-lg rounded-b-3xl bg-primary-100"
           // style={{ backgroundColor: "#4c0519" }}
         >
           <View className="flex-row items-center justify-between">
@@ -745,21 +748,21 @@ export default function UpdateDonorProfile() {
             {/* Last Donation */}
             <SectionLabel text="Donation History" />
             <DatePickerField
-              label="Last Donated At"
+              label="Last Donated At *"
               value={lastDonatedAt}
-              onChange={setLastDonatedAt}
+              onChange={(v) => {
+                setLastDonatedAt(v);
+                if (v) clearFieldError("lastDonatedAt");
+              }}
+              error={fieldErrors.lastDonatedAt}
             />
-            <Text className="mb-3 -mt-1 text-xs text-gray-600">
-              Helps us check eligibility (donors wait 3 months between
-              donations).
-            </Text>
 
             {/* Verification Document */}
             <SectionLabel text="Verification Document" />
             <Text className="mb-2 -mt-1 text-xs text-gray-600">
               Upload your blood group card, previous donation certificate, or any valid proof.
             </Text>
-
+            <Text className="mb-1 text-sm font-medium text-black-200">Upload Blood Group Card *</Text>
             <TouchableOpacity
               onPress={pickDocument}
               className={`flex-row items-center justify-center gap-2 py-3 mb-1 border rounded-xl ${

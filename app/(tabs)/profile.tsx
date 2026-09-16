@@ -144,13 +144,13 @@ export default function Profile() {
     {
       icon: <FontAwesome6 name="user-large" size={20} color="#6b7280" />,
       label: "View My Donor Profile",
-      subtitle: "See your public donor profile",
+      // subtitle: "See your public donor profile",
       onPress: () => router.push("/blood-donor/detail"),
     },
     {
       icon: <FontAwesome6 name="pen-to-square" size={20} color="#ED3632" />,
       label: "Edit Profile",
-      subtitle: "Update your name and email",
+      // subtitle: "Update your name and email",
       onPress: () => router.push("/blood-donor/update"),
     },
     // {
@@ -162,7 +162,7 @@ export default function Profile() {
     {
       icon: <Fontisto name="blood-drop" size={20} color="#ED3632" />,
       label: "My Blood Requests",
-      subtitle: "View requests you've made",
+      // subtitle: "View requests you've made",
       onPress: () => router.push("/blood-request/my-request"),
     },
     // {
@@ -252,9 +252,6 @@ export default function Profile() {
             <View className="flex-1">
               <Text className="text-sm font-bold text-zinc-900 dark:text-white">
                 {item.label}
-              </Text>
-              <Text className="text-zinc-400 text-xs mt-0.5">
-                {item.subtitle}
               </Text>
             </View>
             <Text className="text-lg text-zinc-300 dark:text-zinc-600">›</Text>

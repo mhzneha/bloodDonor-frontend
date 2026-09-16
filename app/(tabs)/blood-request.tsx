@@ -8,6 +8,7 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
+  RefreshControl,
   View,
 } from "react-native";
 
@@ -133,13 +134,14 @@ const PaginationBar = ({
 
 export default function BloodRequestIndex() {
   const [data, setData] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchRequests = async (pageNum: number = page) => {
+  const fetchRequests = async (pageNum: number = page, silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
 
       const token = await AsyncStorage.getItem("auth_token");
 
@@ -153,14 +155,20 @@ export default function BloodRequestIndex() {
 
       setData(res.data.blood_requests);
 
-      const pages = res.data.meta?.pages ?? 1; 
+      const pages = res.data.meta?.pages ?? 1;
 
       setTotalPages(pages);
     } catch (err) {
       console.log("FETCH ERROR:", err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onPullToRefresh = () => {
+    setRefreshing(true);
+    fetchRequests(page, true);
   };
 
   useEffect(() => {
@@ -197,9 +205,17 @@ export default function BloodRequestIndex() {
         className="flex-1 bg-zinc-50 dark:bg-zinc-950"
         contentContainerStyle={{ paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onPullToRefresh}
+            tintColor="#dc2626"
+            colors={["#dc2626"]}
+          />
+        }
       >
         {/* Cards */}
-        <View className="px-5">
+        <View className="px-5 mt-5">
           {data.map((item) => (
             <RequestCard
               key={item.id}

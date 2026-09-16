@@ -103,9 +103,9 @@ const InfoRow = ({
     }`}
   >
     <View className="flex-row items-center" style={{ gap: 10 }}>
-      <Text style={{ fontSize: 15, width: 22, textAlign: "center" }}>
+      {/* <Text style={{ fontSize: 15, width: 22, textAlign: "center" }}>
         {icon}
-      </Text>
+      </Text> */}
       <Text className="text-sm text-gray-600 dark:text-gray-400">{label}</Text>
     </View>
     <Text
@@ -296,7 +296,7 @@ export default function DonorProfileScreen() {
   //  No profile
   if (error === "no_profile" || !profile) {
     return (
-      <View className="flex-1 ">
+      <View className="flex-1 pt-5">
         <View className="px-6 py-8 bg-primary-100 rounded-b-3xl">
           <View className="flex-row items-center" style={{ gap: 12 }}>
             <View>
@@ -320,12 +320,11 @@ export default function DonorProfileScreen() {
             No Donor Profile Yet
           </Text>
           <Text className="text-sm leading-relaxed text-center text-gray-400">
-            You haven't registered as a donor. Join thousands of heroes saving
-            lives by donating blood.
+            You haven't registered as a donor.
           </Text>
           <TouchableOpacity
             onPress={() => router.push("/blood-donor/create")}
-            className="px-8 py-4 mt-2 bg-rose-700 rounded-2xl"
+            className="px-8 py-4 mt-2 bg-primary-100 rounded-2xl"
             activeOpacity={0.85}
           >
             <Text className="text-base font-bold text-white">
@@ -516,25 +515,25 @@ export default function DonorProfileScreen() {
             </Text>
             <View className="px-4 border border-gray-800 rounded-2xl">
               <InfoRow
-                icon={<Fontisto name="blood-drop" size={15} color="#ED3632" />}
+                // icon={<Fontisto name="blood-drop" size={15} color="#ED3632" />}
                 label="Last Donated"
                 value={formatDate(profile.last_donated_at)}
                 valueColor={profile.last_donated_at ? "#10b981" : "#9ca3af"}
               />
               <InfoRow
-                icon={
-                  <FontAwesome6
-                    name="hourglass-half"
-                    size={15}
-                    color="#ffbf00"
-                  />
-                }
+                // icon={
+                //   <FontAwesome6
+                //     name="hourglass-half"
+                //     size={15}
+                //     color="#ffbf00"
+                //   />
+                // }
                 label="Time Since Donation"
                 value={timeAgo(profile.last_donated_at)}
                 valueColor={profile.last_donated_at ? "#10b981" : "#9ca3af"}
               />
               <InfoRow
-                icon={<FontAwesome6 name="check" size={15} color="#10b981" />}
+                // icon={<FontAwesome6 name="check" size={15} color="#10b981" />}
                 label="Eligible to Donate"
                 value={eligible ? "Yes — ready!" : "Not yet (90-day wait)"}
                 valueColor={eligible ? "#10b981" : "#fbbf24"}
@@ -710,7 +709,7 @@ export default function DonorProfileScreen() {
                 </Text>
                 <Text className="text-xs text-gray-400 mt-0.5 leading-relaxed">
                   {eligible
-                    ? "Your profile is active. Thank you for being a hero!"
+                    ? "Your profile is active."
                     : `Last donated ${timeAgo(profile.last_donated_at)}. Wait 90 days between donations.`}
                 </Text>
               </View>

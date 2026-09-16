@@ -1,5 +1,5 @@
 import CustomHeader from "@/components/CustomHeader";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as Location from "expo-location";
@@ -83,7 +83,8 @@ const BloodGroupDropdown = ({
         >
           {value || "Select your blood group"}
         </Text>
-        <Text className="text-sm text-gray-400">▼</Text>
+        {/* <Text className="text-sm text-gray-400">▼</Text> */}
+        <Ionicons name="chevron-down" size={18} color="#9CA3AF" />
       </TouchableOpacity>
 
       {error ? (
@@ -183,7 +184,7 @@ const DatePickerField = ({
 
   return (
     <View className="mb-3">
-      <Text className="mb-1 text-sm font-medium text-black-200">{label}</Text>
+      <Text className="mb-1 text-sm font-medium text-black-200">{label} *</Text>
 
       <TouchableOpacity
         onPress={() => setOpen(true)}
@@ -445,24 +446,17 @@ const removeDocument = (uri: string) => {
 
     if (!bloodGroup) errors.bloodGroup = "Please select your blood group.";
 
-    // if (!location.trim()) errors.location = "Location name is required.";
+    if (!lastDonatedAt) {
+      errors.lastDonatedAt = "Please select your last donation date.";
+    }
 
-    // if (!latitude.trim()) {
-    //   errors.latitude = "Latitude is required.";
-    // } else if (isNaN(Number(latitude))) {
-    //   errors.latitude = "Must be a valid number.";
-    // }
-
-    // if (!longitude.trim()) {
-    //   errors.longitude = "Longitude is required.";
-    // } else if (isNaN(Number(longitude))) {
-    //   errors.longitude = "Must be a valid number.";
-    // }
+    if (documents.length === 0) {
+      errors.document = "Please upload at least one verification document.";
+    }
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
   // const handleMapPress = (event: any) => {
   //   const { latitude, longitude } = event.nativeEvent.coordinate;
 
@@ -651,18 +645,19 @@ const removeDocument = (uri: string) => {
           <DatePickerField
             label="Last Donated At"
             value={lastDonatedAt}
-            onChange={setLastDonatedAt}
+            onChange={(v) => {
+              setLastDonatedAt(v);
+              if (v) clearFieldError("lastDonatedAt");
+            }}
+            error={fieldErrors.lastDonatedAt}
           />
-          <Text className="mb-3 -mt-1 text-xs text-gray-600">
-            Helps us check eligibility (donors should wait 3 months between
-            donations).
-          </Text>
+          
           {/* Verification Document */}
-          <SectionLabel text="Verification Document" />
+          <SectionLabel text="Verification Document " />
           <Text className="mb-2 -mt-1 text-xs text-gray-600">
             Upload your blood group card, previous donation certificate, or any valid proof.
           </Text>
-
+          <Text className="mb-1 text-sm font-medium text-black-200">Upload Blood Group Card *</Text>
           <TouchableOpacity
             onPress={pickDocument}
             className={`flex-row items-center justify-center gap-2 py-3 mb-1 border rounded-xl ${
@@ -704,9 +699,9 @@ const removeDocument = (uri: string) => {
           {fieldErrors.document ? (
             <Text className="mt-1 text-xs text-red-400">{fieldErrors.document}</Text>
           ) : null}    
-          <Text className="text-sm font-semibold text-black-200">
+          {/* <Text className="text-sm font-semibold text-black-200">
             {documents.length > 0 ? "Add More Documents" : "Upload Document"}
-          </Text>
+          </Text> */}
           {/* Location */}
           {/* <SectionLabel text="Location" /> */}
 
@@ -909,9 +904,6 @@ const removeDocument = (uri: string) => {
             )}
           </TouchableOpacity>
 
-          <Text className="mt-4 text-xs text-center text-gray-600">
-            Your profile can be updated at any time from settings.
-          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

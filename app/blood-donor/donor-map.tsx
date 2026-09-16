@@ -37,14 +37,26 @@ export default function FindDonorsScreen() {
     const fetchDonors = async () => {
       try {
         const token = await AsyncStorage.getItem("auth_token");
-        const res = await axios.get(`${BASE_URL}/donor_profiles`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-        const data = res.data.donors as Donor[];
+        let allDonors: Donor[] = [];
+        let page = 1;
+        let totalPages = 1; // will be updated after first request
 
-        // Filter out donors with missing or 0 coordinates
-        const validDonors = data.filter((d) => {
+        do {
+          const res = await axios.get(`${BASE_URL}/donor_profiles`, {
+            headers,
+            params: { page },
+          });
+
+          const pageDonors = res.data.donors as Donor[];
+          allDonors = [...allDonors, ...pageDonors];
+
+          totalPages = res.data.meta.pages;
+          page++;
+        } while (page <= totalPages);
+
+        const validDonors = allDonors.filter((d) => {
           const lat = parseFloat(d.latitude);
           const lng = parseFloat(d.longitude);
           return (
