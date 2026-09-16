@@ -51,7 +51,7 @@ interface MatchingDonorsResponse {
 // Tracks the donation request Claude/the app has sent out to a given donor
 interface SentRequestState {
   requestId: number;
-  status: "pending" | "accepted" | "declined";
+  status: "pending" | "accepted" | "declined" | "completed";
 }
 
 //  Constants
@@ -268,46 +268,56 @@ const DonorCard = ({
           <Text className="text-sm font-bold text-white">Call</Text>
         </TouchableOpacity>
 
-        {requestStatus?.status === "accepted" ? (
-          <TouchableOpacity
-            onPress={onTrackDonor}
-            className="flex-1 flex-row items-center justify-center rounded-xl py-2.5"
-            style={{ gap: 6, backgroundColor: "#16a34a" }}
-            activeOpacity={0.85}
-          >
-            <FontAwesome6 name="location-crosshairs" size={15} color="#fff" />
-            <Text className="text-sm font-bold text-white">Track Donor</Text>
-          </TouchableOpacity>
-        ) : requestStatus?.status === "pending" ? (
+        {requestStatus?.status === "completed" ? (
           <View
             className="flex-1 flex-row items-center justify-center rounded-xl py-2.5"
-            style={{ backgroundColor: "#9ca3af" }}
+            style={{ gap: 6, backgroundColor: "#16a34a" }}
           >
-            <Text className="text-sm font-bold text-white">Waiting</Text>
+            <FontAwesome6 name="check" size={14} color="#fff" />
+            <Text className="text-sm font-bold text-white">Completed</Text>
           </View>
-        ) : requestStatus?.status === "declined" ? (
-          <TouchableOpacity
-            onPress={onSendRequest}
-            className="flex-1 flex-row items-center justify-center rounded-xl py-2.5"
-            style={{ gap: 6, backgroundColor: "#dc2626" }}
-            activeOpacity={0.85}
-          >
-            <FontAwesome6 name="rotate-right" size={14} color="#fff" />
-            <Text className="text-sm font-bold text-white">
-              Declined · Resend
-            </Text>
-          </TouchableOpacity>
         ) : (
-          <TouchableOpacity
-            onPress={onSendRequest}
-            className="flex-1 flex-row items-center justify-center rounded-xl py-2.5 bg-primary-200"
-            style={{ gap: 6 }}
-            activeOpacity={0.85}
-          >
-            <FontAwesome name="send-o" size={15} color="#ffffff" />
-            <Text className="text-sm font-bold text-white">Send Request</Text>
-          </TouchableOpacity>
-        )}
+            // requestStatus?.status === "accepted" ? (
+            //   <TouchableOpacity
+            //     onPress={onTrackDonor}
+            //     className="flex-1 flex-row items-center justify-center rounded-xl py-2.5"
+            //     style={{ gap: 6, backgroundColor: "#16a34a" }}
+            //     activeOpacity={0.85}
+            //   >
+            //     <FontAwesome6 name="location-crosshairs" size={15} color="#fff" />
+            //     <Text className="text-sm font-bold text-white">Track Donor</Text>
+            //   </TouchableOpacity>
+            // ) : requestStatus?.status === "pending" ? (
+            //   <View
+            //     className="flex-1 flex-row items-center justify-center rounded-xl py-2.5"
+            //     style={{ backgroundColor: "#9ca3af" }}
+            //   >
+            //     <Text className="text-sm font-bold text-white">Waiting</Text>
+            //   </View>
+            // ) : requestStatus?.status === "declined" ? (
+            //   <TouchableOpacity
+            //     onPress={onSendRequest}
+            //     className="flex-1 flex-row items-center justify-center rounded-xl py-2.5"
+            //     style={{ gap: 6, backgroundColor: "#dc2626" }}
+            //     activeOpacity={0.85}
+            //   >
+            //     <FontAwesome6 name="rotate-right" size={14} color="#fff" />
+            //     <Text className="text-sm font-bold text-white">
+            //       Declined · Resend
+            //     </Text>
+            //   </TouchableOpacity>
+            // ) : (
+            <TouchableOpacity
+              onPress={onSendRequest}
+              className="flex-1 flex-row items-center justify-center rounded-xl py-2.5 bg-primary-200"
+              style={{ gap: 6 }}
+              activeOpacity={0.85}
+            >
+              <FontAwesome name="send-o" size={15} color="#ffffff" />
+              <Text className="text-sm font-bold text-white">Send Request</Text>
+            </TouchableOpacity>
+            // )
+          )}
       </View>
     </View>
   );
@@ -550,21 +560,19 @@ export default function MatchingDonorsScreen() {
     const token = await AsyncStorage.getItem("auth_token");
     if (!token) return;
 
-    const pendingEntries = Object.entries(sentRequestsRef.current).filter(
-      ([, r]) => r.status === "pending",
+    const activeEntries = Object.entries(sentRequestsRef.current).filter(
+      ([, r]) => r.status === "pending" || r.status === "accepted",
     );
-    if (pendingEntries.length === 0) return;
+    if (activeEntries.length === 0) return;
 
     await Promise.all(
-      pendingEntries.map(async ([donorIdStr, r]) => {
+      activeEntries.map(async ([donorIdStr, r]) => {
         try {
           const { data: res } = await axios.get(
             `${BASE_URL}/blood_donation_requests/${r.requestId}`,
             { headers: { Authorization: `Bearer ${token}` } },
           );
 
-          // Same shape assumption as above: adjust if your API nests this
-          // under `donation_request`.
           const latestStatus: SentRequestState["status"] =
             res?.donation_request?.status ?? res?.status ?? r.status;
 
@@ -588,6 +596,13 @@ export default function MatchingDonorsScreen() {
                 text1: "Donor Declined",
                 position: "bottom",
               });
+            } else if (latestStatus === "completed") {
+              Toast.show({
+                type: "success",
+                text1: "Donation Completed",
+                text2: `${r.requestId} has finished donating.`,
+                position: "bottom",
+              });
             }
           }
         } catch (e) {
@@ -596,7 +611,7 @@ export default function MatchingDonorsScreen() {
       }),
     );
   }, []);
-
+    
   // Start/stop polling while this screen is focused
   useFocusEffect(
     useCallback(() => {

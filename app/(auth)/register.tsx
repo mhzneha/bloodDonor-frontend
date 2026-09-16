@@ -45,6 +45,16 @@ interface RegisterErrorResponse {
   errors: string[];
 }
 
+  interface FieldErrors {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    password?: string;
+    confirmPassword?: string;
+    general?: string;
+  }
+
+
 const API_URL = "https://blood-donor-finder-be.onrender.com/users";
 
 export default function Register() {
@@ -54,7 +64,8 @@ export default function Register() {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [errors, setErrors] = useState<string[]>([]);
+    const [errors, setErrors] = useState<FieldErrors>({});
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -70,7 +81,7 @@ export default function Register() {
   };
 
   const handleRegister = async (): Promise<void> => {
-    setErrors([]);
+    setErrors({});
 
     const isStrongPassword = (password: string) => {
       const minLength = /.{8,}/;
@@ -86,32 +97,26 @@ export default function Register() {
       );
     };
 
-    if (!fullName || !email || !password || !confirmPassword) {
-      setErrors(["Please fill in all required fields"]);
-      return;
-    }
+    const fieldErrors: FieldErrors = {};
 
-    if (!email.includes("@")) {
-      setErrors(["Please enter a valid email"]);
-      return;
-    }
+    if (!fullName) fieldErrors.fullName = "Full name is required";
+    if (!email) fieldErrors.email = "Email is required";
+    else if (!email.includes("@")) fieldErrors.email = "Please enter a valid email";
+    if (!phone) fieldErrors.phone = "Phone number is required";
+    else if (!isValidNepaliPhone(phone))
+      fieldErrors.phone =
+        "Enter a valid Nepali phone number (10 digits starting with 98, 97, or 96)";
+    if (!password) fieldErrors.password = "Password is required";
+    else if (!isStrongPassword(password))
+      fieldErrors.password =
+        "Min 8 characters, 1 uppercase, 1 number, 1 special character";
+    if (!confirmPassword)
+      fieldErrors.confirmPassword = "Please confirm your password";
+    else if (password !== confirmPassword)
+      fieldErrors.confirmPassword = "Passwords do not match";
 
-    if (!isValidNepaliPhone(phone)) {
-      setErrors([
-        "Please enter a valid Nepali phone number (10 digits starting with 98, 97, or 96)",
-      ]);
-      return;
-    }
-
-    if (!isStrongPassword(password)) {
-      setErrors([
-        "Password must be at least 8 characters long and include 1 uppercase letter, 1 number, and 1 special character",
-      ]);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrors(["Passwords do not match"]);
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
       return;
     }
 
@@ -141,17 +146,17 @@ export default function Register() {
 
       if (error.response) {
         const serverErrors = error.response.data?.errors;
-        setErrors(
-          Array.isArray(serverErrors)
-            ? serverErrors
-            : ["Something went wrong. Please try again."],
-        );
+        setErrors({
+          general: Array.isArray(serverErrors)
+            ? serverErrors.join(" ")
+            : "Something went wrong. Please try again.",
+        });
       } else if (error.request) {
-        setErrors([
-          "Network error. Please check your connection and try again.",
-        ]);
+        setErrors({
+          general: "Network error. Please check your connection and try again.",
+        });
       } else {
-        setErrors(["An unexpected error occurred. Please try again."]);
+        setErrors({ general: "An unexpected error occurred. Please try again." });
       }
     } finally {
       setLoading(false);
@@ -185,16 +190,11 @@ export default function Register() {
           {/* Form card */}
           <View className="p-5 bg-white shadow-md dark:bg-gray-800 rounded-2xl">
             {/* Error messages */}
-            {errors.length > 0 && (
+                        {errors.general && (
               <View className="p-3 mb-4 border border-red-300 bg-red-50 dark:bg-red-900/30 rounded-xl">
-                {errors.map((err: string, index: number) => (
-                  <Text
-                    key={index}
-                    className="text-sm text-red-600 dark:text-red-400"
-                  >
-                    • {err}
-                  </Text>
-                ))}
+                <Text className="text-sm text-red-600 dark:text-red-400">
+                  {errors.general}
+                </Text>
               </View>
             )}
 
@@ -209,6 +209,9 @@ export default function Register() {
                 value={fullName}
                 onChangeText={(text: string) => setFullName(text)}
               />
+              {errors.fullName && (
+                <Text className="mt-1 text-xs text-red-500">{errors.fullName}</Text>
+              )}
             </View>
 
             <View className="mb-4">
@@ -222,6 +225,9 @@ export default function Register() {
                 value={email}
                 onChangeText={(text: string) => setEmail(text)}
               />
+              {errors.email && (
+                <Text className="mt-1 text-xs text-red-500">{errors.email}</Text>
+              )}
             </View>
 
             <View className="mb-4">
@@ -236,21 +242,10 @@ export default function Register() {
                 value={phone}
                 onChangeText={(text: string) => setPhone(text)}
               />
+              {errors.phone && (
+                <Text className="mt-1 text-xs text-red-500">{errors.phone}</Text>
+              )}
             </View>
-
-            {/* <View className="mb-4">
-              <Text className="mb-2 text-gray-700 dark:text-white">
-                Password
-              </Text>
-              <TextInput
-                className="p-4 bg-gray-100 rounded-md dark:bg-gray-700 dark:text-white"
-                placeholder="Password"
-                placeholderTextColor="#9CA3AF"
-                secureTextEntry
-                value={password}
-                onChangeText={(text: string) => setPassword(text)}
-              />
-            </View> */}
 
             <View className="relative mb-4">
               <Text className="mb-2 text-gray-700 dark:text-white">
@@ -276,21 +271,10 @@ export default function Register() {
                   color="#666"
                 />
               </TouchableOpacity>
+              {errors.password && (
+                <Text className="mt-1 text-xs text-red-500">{errors.password}</Text>
+              )}
             </View>
-
-            {/* <View className="mb-2">
-              <Text className="mb-2 text-gray-700 dark:text-white">
-                Confirm Password
-              </Text>
-              <TextInput
-                className="p-4 bg-gray-100 rounded-md dark:bg-gray-700 dark:text-white"
-                placeholder="Confirm Password"
-                placeholderTextColor="#9CA3AF"
-                secureTextEntry
-                value={confirmPassword}
-                onChangeText={(text: string) => setConfirmPassword(text)}
-              />
-            </View> */}
 
             <View className="relative mb-2">
               <Text className="mb-2 text-gray-700 dark:text-white">
@@ -316,6 +300,11 @@ export default function Register() {
                   color="#666"
                 />
               </TouchableOpacity>
+              {errors.confirmPassword && (
+                <Text className="mt-1 text-xs text-red-500">
+                  {errors.confirmPassword}
+                </Text>
+              )}
             </View>
 
             <Pressable
